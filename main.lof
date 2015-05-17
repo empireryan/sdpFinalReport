@@ -1,0 +1,40 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Inverter System Overview\relax }}{5}{figure.caption.23}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Traditional Boost Converter Circuit\relax }}{8}{figure.caption.29}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Solar Panel IV Characteristics\relax }}{9}{figure.caption.31}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces PSPICE Boost Converter Simulation\relax }}{10}{figure.caption.32}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Boost Converter Approaching Steady State\relax }}{10}{figure.caption.33}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Switching Signal and Inductor Current\relax }}{11}{figure.caption.34}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Assembled Boost Circuit\relax }}{13}{figure.caption.48}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces The Hybrid Inverter Team's assembled PCB\relax }}{17}{figure.caption.56}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Solar Panel Stand\relax }}{18}{figure.caption.57}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Jump Map of the Hybrid Algorithm\relax }}{20}{figure.caption.62}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Software System OVerview\relax }}{22}{figure.caption.65}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces The Fast ISR\relax }}{23}{figure.caption.66}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces The Slow ISR\relax }}{24}{figure.caption.68}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces The Canonical DC-DC Boost Circuit\relax }}{30}{figure.caption.89}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Sampled Data Before Estimation\relax }}{34}{figure.caption.108}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Sampled Data with Estimation\relax }}{35}{figure.caption.109}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Linearized Model of the PWM per Ridley\cite {ridley}\relax }}{36}{figure.caption.111}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces The total transfer function $f_p(s)f_h(s)$ for the DC boost circuit\relax }}{38}{figure.caption.115}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces The lag compensator for the DC boost circuit\relax }}{39}{figure.caption.117}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces The Plant, Compensator, and Closed Feedback Loop Bode Plots for the DC boost circuit\relax }}{39}{figure.caption.118}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Bode plot of the closed loop transfer function with gain and phase margin labels\relax }}{40}{figure.caption.119}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Logic Power Supply Circuit\relax }}{43}{figure.caption.127}
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Boost Circuit\relax }}{43}{figure.caption.128}
+\contentsline {figure}{\numberline {A.3}{\ignorespaces PV Voltage Sense Circuit\relax }}{44}{figure.caption.129}
+\contentsline {figure}{\numberline {A.4}{\ignorespaces PV Current Sense Circuit\relax }}{44}{figure.caption.130}
+\contentsline {figure}{\numberline {A.5}{\ignorespaces Gate Driver Circuit\relax }}{45}{figure.caption.131}
+\contentsline {figure}{\numberline {A.6}{\ignorespaces Switch Current Sense Circuit\relax }}{45}{figure.caption.132}
+\contentsline {figure}{\numberline {A.7}{\ignorespaces Boosted Voltage Sense Circuit\relax }}{46}{figure.caption.133}
+\contentsline {figure}{\numberline {A.8}{\ignorespaces Boost Converter Schematic\relax }}{46}{figure.caption.134}
+\contentsline {figure}{\numberline {A.9}{\ignorespaces Boost Board PCB Top\relax }}{47}{figure.caption.135}
+\contentsline {figure}{\numberline {A.10}{\ignorespaces Boost Board PCB Bottom\relax }}{47}{figure.caption.136}
+\contentsline {figure}{\numberline {A.11}{\ignorespaces Board Board PCB\relax }}{48}{figure.caption.137}
+\contentsline {figure}{\numberline {A.12}{\ignorespaces PCB Top Layer\relax }}{48}{figure.caption.138}
+\contentsline {figure}{\numberline {A.13}{\ignorespaces PCB bottom\relax }}{49}{figure.caption.139}
