@@ -21,30 +21,55 @@ In order to meet the challenge of building next-generation power conversion tech
 With the cost of photovoltaics rapidly decreasing, we have seen a rush toward the adoption of solar micro-grids which seek to exploit the most abundant source of power known to mankind - the sun. However, our heliocentric conundrum - namely the fact that the earth orbits the sun - dictates that most places on earth receive time-dependent quantities of solar irradiance over the course of any given day. This high variability in the context of power conversion implies major challenges to our modern power grid which guarantees nearly continuous up-time. Additionally, today's power conversion technologies are not robust to highly variable input sources like solar power. Some other challenges we face when converting DC solar power to AC power which is usable in our power grid is the problem of shading or partial irradiance of solar arrays, and the non-linear nature of the photovoltaics themselves. In particular, this non-linear behavior necessitates the implementation of maximum power point tracking or MPPT algorithms which comprehend this phenomena and harvest the most power from solar sources which typically have a finite lifespan. This is critical for obtaining the maximum benefit from the non-trivial investment required to operate solar arrays today. 
 
 \subsection{Square and Modified Square Inverters}
- Note that the difference between a pure square wave and a modified square wave is the allowance of the zero state determined by the quantity $\alpha$ shown in Figure \ref{modifiedSquare}. Note that the Fourier series of the output is given by 
+Square wave inverters are the simples method for generating pseudo-sinusoidal outputs using an H-Bridge. Emulating the positive and negative half cycles of the sine with a simple bipolar scheme where the output is given be $+V_{dc}$ and $-V_{dc}$ respectively. After a filtering stage, the output can be shaped into something resembling a sine wave by only allowing the low frequency components of the square wave to pass. Note that the difference between a pure square wave and a modified square wave is the allowance of the zero state determined by the quantity $\alpha$ shown in Figure \ref{modifiedSquare}. Note that the Fourier series of the output is given by 
 \begin{equation}
 v_0(t)=\sum\limits_{n,odd}V_n\sin{n\omega_0t}
 \end{equation}
-where $V_n=\frac{4V_dc}{n\pi}cos{n\alpha}$. This would add considerably to the complexity of any inverter system seeking to control both parameters simultaneously. The harmonic content can be controlled by varying the quantity $\alpha$, and the amplitude can also be controlled by $\alpha$. With some analysis, it could be shown that the harmonic content or the amlpitude of the output can be controlled, but not both simultaneously unless we have a vairbale $V_{dc}$ input. 
+where 
+\begin{equation}
+V_n=\frac{4V_dc}{n\pi}cos{n\alpha}
+\end{equation}
+This would add considerably to the complexity of any inverter system seeking to control both parameters simultaneously. The harmonic content can be controlled by varying the quantity $\alpha$, and the amplitude can also be controlled by $\alpha$. With some analysis, it could be shown that the harmonic content or the amlpitude of the output can be controlled, but not both simultaneously unless we have a vairbale $V_{dc}$ input. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.5in]{modifiedSquare}
+\caption{Modified Square Wave}
+\label{modifiedSquare}
+\end{figure}
 
 The `deal-breaker' with the square wave inverter is the fact the the spectral content of the output is particularly rich at all odd harmonics of the fundamental. This means that we are left with a bulk of the harmonic content at low frequencies which are particularly hard to filter with analog components. 
 
 \subsection{Linear Control and the PWM approach}
-Compared to square and modified square wave inverters, much of the filtering burden is alleviated due to the fact that spectral content in the vicinity of the fundamental is located near the modulation index of the PWM signal.
+Compared to square and modified square wave inverters, much of the filtering burden is alleviated due to the fact that spectral content in the vicinity of the fundamental is located near the frequency modulation index of the PWM signal. Pulse-width modulation (PWM), or bang-bang techniques, are a popular means for taking a fixed input voltage and varying the effective power seen at the output. This is done by rapidly switching the input off and on such that the the output is some fraction of the input including zero and one hundred percent. This fraction corresponds to the duty cycle. If we pair the PWM technique with the ability to drive current bidirectionally, say, through an H-Bridge circuit, we can use this technique to trace out a pseudo-sinusoidal output. 
 
-Pulse-width modulation (PWM), or bang-bang techniques, are a popular means for taking a fixed input voltage and varying the effective power seen at the output. This is done by rapidly switching the input off and on such that the the output is some fraction of the input including zero and one hundred percent. This fraction corresponds to the duty cycle. If we pair the PWM technique with the ability to drive current bidirectionally, say, through an H-Bridge circuit, we can use this technique to trace out a pseudo-sinusoidal output. 
+In contrast to the square wave inverters discussed above, with PWM it is possible to vary amplitude and frequency independently. The modulation index, which is given by $m_f=\frac{f_{tri}}{f_{sin}}$ where $f_{tri}$ is the frequency of the triangular carrier frequency, and $f_{sin}$ is the sinusoidal reference signal. 
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics[width=3.5in]{modifiedSquare}
-\caption{ModifiedSquareWave}
-\label{modifiedSquare}
+\includegraphics[width=3.5in]{bipolarSwitching}
+\caption{Bipolar Switching}
+\label{bipolar}
 \end{figure}
 
-
-The modulation index, which is given by $m_f=\frac{f_{tri}}{f_{sin}}$ where $f_{tri}$ is the frequency of the triangular carrier frequency, and $f_{sin}$ is the sinusoidal reference signal. 
-
 The switch in this case can take the form of a relay, but more commonly in power applications, takes the form of a field-effect transistor (MOSFET) or insulated gate bipolar transistor (IGBT). The effective voltage or current is varied by varying the duration of on-time of the switch. One can think of this as int terms of a common household faucet with only two states, either fully on or off. If we were able to modulate the amount of time that the water flowed from the faucet, clearly we would be able to choose the flow-rate of the water from the two extrema - on or off - to an arbitrary level of precision depending on how fast we were able to turn the faucet on or off. The scenario put forth in the 'kitchen sink' analogy is analogous to the situation we face in a modern power inverter. In this case, we are faced with the challenge of taking a typically fixed input voltage and switching it in such a way that we achieve a close approximation to a sinusoidal output voltage. Given the clear explanation of how PWM techniques can vary from fully on to fully off in the description above, it is easy to see why the PWM approach has become the standard for power inverters. Additionally, today's microcontrollers have extremely sophisticated peripheral modules built specifically for very fast and PWM signal generation with resolution down to the nanosecond level becoming quite common. 
+
+@todo:cite figures!
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.5in]{unipolarSwitching}
+\caption{Unipolar Switching}
+\label{unipolar}
+\end{figure}
+
+The Fourier analysis for either bipolar or unipolar PWM output signals is not as straightforward as that of the square wave, so a full derivation is ommited from this discussion. However, the fact that the harmonic content occurs at multiples of the modulation frequency can be clearly observed in Figure \ref{pwmFourier}. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.5in]{pwmFourier}
+\caption{Fourier Spectrum Frequency Diagram for PWM Inverter Control}
+\label{pwmFourier}
+\end{figure}
 
 Although the PWM method for signal modulation has the clear advantages of widespread adoption and ease of implementation, with the widespread adoption of renewable energy in the form of highly local and decentralized micro-grids, we are increasingly faced with the problem of introducing increasing amounts of high-order noise into the power grid. Further, the typical proportional, integral, derivative, or PID methods for control suffer from a ringing phenomena in the presence of input disturbances which are typical of renewable energy applications. In light of these issues with the PWM technique for power conversion, we seek to explore alternate strategies for switching that might alleviate the vulnerability to  input disturbances and the problem of an unintentionally rich spectrum at the output of PWM power converters. 
 
