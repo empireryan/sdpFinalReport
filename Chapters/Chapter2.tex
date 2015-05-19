@@ -179,12 +179,12 @@ One of the primary factors in the overall efficiency of a modern switching power
 
 The heat sinks in our design are connected to the AC ground. Both the low-side and high-side transistors are insulated from the heat sink with thermal pads and insulating shoulder washers. According to the Transform application note we used as reference during our design, "For the high-side transistor, capacitance between the TO220 tab and the heat sink will add to switching loss, and so a thick and/or low permittivity insulator should be used."\cite{transphorm}
 
-The gate drivers we chose, the SI823x family from Silicon Labs, have a built-in under voltage protection to prevent 'nuisance trips' and to add a good deal of noise margin. The gate drivers utilize a typical 'bootstrap' circuit to operate as both a high-side and low-side driver. 
+The gate drivers we chose, the SI823x family from Silicon Labs, have a built-in under voltage protection to prevent `nuisance trips' and to add noise margin to our control signal. The gate drivers utilize a bootstrap circuit to operate as both a high-side and low-side driver. 
 
 Because of the relatively high speeds involved with the H-Bridge, careful layout was especially important here. Parasitic capacitance on gate and drain loops are a min cause of overshoot and ringing in the circuit, and thus the total enclosed area between the gate drive and the FETs was kept to the absolute minimum. In order to minimize inductance in the output current path, high current power and ground planes were utilized. Small ferrite beads were used between the gate drive output and the gates of the FETs to reduce ringing cause by coupling of the drain current to the gate drive loop- these were found to be more useful than small resistances which are sometimes used \cite{transphorm}. High voltage SMD ceramic bypass capacitors were placed directly underneath either side of the H-Bridge circuit to minimize the series inductance in the circuit. 
   
 \subsection{RLC Filter}
-In a typical PWM design, the driver behind the cutoff frequency of the output filter is the carrier frequency of the PWM signal. In most cases, this carrier frequency is invariant, and therefore allows for a relatively straightforward design parameter during the time where components are selected. Of course, THD is also a primary driver of part selection and valuation of the analog components.
+In a typical PWM design, the driver factor behind the cutoff frequency of the output filter is the carrier frequency of the PWM signal. In most cases, this carrier frequency is invariant, and therefore allows for a relatively straightforward design parameter during the time where components are selected. Of course, THD is also a primary driver of part selection and valuation of the analog components.
 
 
 In order to ensure that the vector fields on the power plane are such that the hybrid algorithm can ensure forward invariance, and that the solution of the system converges to the tracking band in finite time,  it is necessary that our design adhere to a set of constraints on the RLC filter described in \cite{ricardo}. 
@@ -211,20 +211,13 @@ The input to the H-bridge has a DC voltage resistive divider to monitor its curr
 \subsection{Microcontroller and USB-JTAG Interface}
 At the heart of the inverter system is the Texas Instruments Piccolo F28035 microcontroller of their C2800 series. This embedded controller's internal architecture is optimized for real time control of devices like switching power converters. This type of microcontroller has an control law accelerator which can process the sampled power measurement data without burdening the main processor running the feedback control algorithms. The device also features versatile pulse width modulation units which can be connected to the general purpose outputs for driving the switching power transistors of the boost converter and H-bridge. Other external microcontroller system hardware includes resistor arrays and voltage protection diodes on GPIO and ADC connections from the feedback sensors. An oscillator crystal is used for generating a stable clock signal.
 
-The Piccolo microcontroller supports JTAG boundary scanning for device programming and real time debugging. To connect to through the JTAG topology, several integrated circuit solution systems have been implemented in our inverter. Controller programming from code compiled on a PC necessitated a USB connection to the PCB. The Future Technology Devices Internation (FTDI) IC FT2232C was utilized to interface between the USB UART connection and the JTAG network. This device also also the configuration of an EEPROM flash memory array for program information. The USB connection provides its own power to the JTAG conversion circuit so galvanic isolation was used between the USB power supply and that of the main inverter board. Digital signals are sent between the two subsystems through a series of digital isolator ICs which use capacitive coupling. A Texas Instruments IC MAX3221 is used as a RS-232 driver/receiver for the serial RX and TX connections between the FTDI chip and the microcontroller.  
+The Piccolo microcontroller supports JTAG boundary scanning for device programming and real time debugging. To connect to through the JTAG topology, several integrated circuit solution systems have been implemented in our inverter. Controller programming from code compiled on a PC necessitated a USB connection to the PCB. The Future Technology Devices International (FTDI) IC FT2232C was utilized to interface between the USB UART connection and the JTAG network. This device also also the configuration of an EEPROM flash memory array for program information. The USB connection provides its own power to the JTAG conversion circuit so galvanic isolation was used between the USB power supply and that of the main inverter board. Digital signals are sent between the two subsystems through a series of digital isolator ICs which use capacitive coupling. A Texas Instruments IC MAX3221 is used as a RS-232 driver/receiver for the serial RX and TX connections between the FTDI chip and the microcontroller.  
 
 
-\subsection{Complete Hardware System}
+\subsection{The Hybrid Inverter Team Development Board}
 The final PCB layout utilized a four layer design with power and ground planes on the two middle layers. Multiple layers allowed for components to be placed closer together, and achieve a smaller overall form factor. Additionally, we were able to use polygon pours on the central power layers to boost current carrying capacity and aid in the dissipation of heat. Ground plane isolation was used to separate areas with switching power signal and digital logic.
 
 Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}. 
-
-%\begin{figure}
-%\centering
-%\includegraphics[width = 3.5in]{hybrid_pcb.jpg}
-%\caption{PCB Complete}
-%\label{PCB complete}
-%\end{figure}
 
 \begin{figure}
 \centering
