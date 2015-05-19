@@ -7,8 +7,6 @@
 \lhead{Chapter 4. \emph{Control of the Boost Converter}} % This is for the header on each page - perhaps a shortened title
 
 %----------------------------------------------------------------------------------------
-
-\section{DC Boost Controller}
 In order to better understand the control mechanisms at play in a typical power inverter, we undertook a course of study to learn about the state-of-the-art in DC boost control. The the DC boost circuit is a highly non-linear mechanism - much of my initial research was into the various mathematical techniques employed to develop linear models of the circuit. Amongst them are the state space averaging technique, circuit linearization via transformation, numerical methods, and small signal analysis.
 
 In the particular case of the DC-DC boost converter circuit shown in Fig. \ref{boost}, the design of a digital or analog controller is complicated by the non-linear nature of the system. From linear control theory, we know that positive gain and phase margins are necessary to ensure the stability of a system in the presence of disturbances. Gain margin can be understood as a safety margin for model uncertainty, while the phase margin provides a safety factor of additional phase lag or lead to ensure system stability. In order to achieve this goal while simultaneously designing for quick response, we set out to study the design of compensators for controlling this class of PWM boost converters. 
@@ -32,11 +30,11 @@ Finally, we will discuss the steps needed to implement the compensator digitally
 
 %\subsection*{Boost Controller Analysis}
 
-\subsubsection{Towards a Linear Model of the DC Boost}
+\section{Towards a Linear Model of the DC Boost}
 
 The DC boost circuit in Fig. \ref{boost} has been the subject of countless dissertations dating back to the nineteen seventies. Accordingly, the landscape is a dense one. Fortunately, most researchers agree on a small signal model developed by Dr. Raymond Ridley in the nineties. Ridley's innovation was his synergistic approach, applying both numerical, sampled-data techniques with his current control model. This model employed a linear model of PWM which allowed for the simplified analysis of all SWMPS topologies. This is the model that we've used to develop my controller, and it is found to be third-order. See Equation \ref{thirdOrder}. See Equation. For the sake of being thorough, we will cover some alternative methods of analysis and circle-back to a discussion on Dr. Ridley's small signal and modeling approach.
 
-\subsubsection{Dynamic Averaging}
+\subsection{Dynamic Averaging}
 
 In \cite{mohan}, a method for modeling the DC boost circuit with an ideal switch, an ideal transformer, and ideal current sources allows for a straightforward analysis using basic circuit analysis. After linearizing the circuit model, perturbation theory is applied to allow for the treatment of the non-linear variables as a sum of they DC and AC components. For example, the function $x(t)$ would be represented as $x(t) = X + \tilde{x}$, where $X$ is the DC components, and $\tilde{x}$ is the AC component of the small signal representation. 
 
@@ -60,7 +58,7 @@ For a duty cycle $D$, effective inductance $L_e$, capacitance C. Note that the e
 
 Mohan's analysis was a useful stepping stone for understanding the basis for circuit linearization, in addition to his concise coverage of the modes of operation seen on DC boost converters. Namely, the two DC steady states either off or fully on, in addition to discontinuous and continuous conduction regimes. 
 
-\subsubsection{State Space Averaging}
+\subsection{State Space Averaging}
 
 Because the DC boost circuit can be viewed as occupying one of two states - off or on - we can view a linearized model of the circuit as being the average of the two states, based on the duty cycle of the PWM. 
 
@@ -172,7 +170,8 @@ So we have that
 \end{equation}
 Note the deviation in this result from the previous one obtained by the average dynamic model. We did not utilize this method for designing the feedback loop, but it was a useful and enlightening exercise nonetheless.
 
-\subsubsection{Numerical Methods in Matlab}
+\subsection{Numerical Methods in Matlab}
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[height = 3in, width = \columnwidth]{prePlant}
@@ -225,10 +224,10 @@ Use the frest.Sinestream command to define the sinusoids to inject at the input 
 	figure, bode(sysData,'*r',bopt)
 \end{verbatim}
 
-\subsubsection{Small Signal Analysis}
+\subsection{Small Signal Analysis}
 After a bit of derivation, we arrive at our final point of analysis, the small signal model proposed by Dr. Ray Ridley in his PhD dissertation circa 1990. Using a combination of the technique describes above, Dr. Ridley was able to come up with a linear model of the PWM block that could be used alongside numerical methods. The resulting Transfer function has proven to be the most accurate and reliable for designers of SWMPS. Before we jump into his methods, We'd like to touch on the two fundamental methods for controlling the DC boost circuit.
  
- \begin{figure}[htbp]
+\begin{figure}[htbp]
 \begin{center}
 \includegraphics[height= 3in, width = \columnwidth]{pwmModel}
 \caption{Linearized Model of the PWM per Ridley\cite{ridley}}
@@ -277,7 +276,7 @@ f_p(s)f_h(s)=\frac{k[1 + \frac{s}{w_z}][1 - \frac{s}{w_{z,RHP}}]}{[1 + \frac{s}{
 From here, we are ready to analyze the resultant Bode plot to determine what type of compensation will be necessary for this plant model. This plot is shown below in Fig.\ref{plantModelRidley}.
 The poles and zeros are placed in such a way that the system has enough phase margin, and to minimize the effect of maximum phase lag due to a Right-Half plane zero.
 
- \begin{figure}[htbp]
+\begin{figure}[htbp]
 \begin{center}
 \includegraphics[height= 3in, width = \columnwidth]{plantModelRidley}
 \caption{The total transfer function $f_p(s)f_h(s)$ for the DC boost circuit}
@@ -327,8 +326,8 @@ For a closer inspection, see Fig. \ref{gpMargin} which clearly shows the gain an
 \end{center}
 \end{figure}
 
-\subsection{2P2Z}
+\section{2P2Z}
 As we can see, the lag compensator was simply a special case of PI control. A 2P2Z can implement the continuous time version by way of a bilinear or Tustin transformation. The rule for the bilinear transform is that $s\leftarrow\frac{2z-1}{Tz+1}$, Performing this transformation on our controller equation results in an expression of the same form, implementable in assembly on a C2000 Piccolo micro controller by Ti. A toll recommended by TI is the Biricha tool that takes the placement of your poles and zeroes and converted them to the necessary coefficients for the micro.
 
-\subsection{Boost Controller Conclusion}
+\section{Boost Controller Conclusion}
 After a fairly exhaustive review of the literature regarding the accuracy of the linearized DC boost model, and the control theory behind their employment in SWMPS, We were able to get favorable results in simulation, namely a stable system. While there are multiple methods for linearizing the boost circuit, the most widely accepted models today utilize that of Dr. Ridley's due to its highly accurate predictions. This model was used in the design of a lag compensator. The Final phase involved the conversion of my linear model to a discrete model suitable for implementation on a micro controller.

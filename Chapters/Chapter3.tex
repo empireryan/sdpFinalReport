@@ -33,7 +33,7 @@ As stated previously, PWM algorithms offer a relatively simple means for analyzi
 \end{center}
 \end{figure}
 
-\subsection{Software System Overview}
+\section{Software System Overview}
 \label{softOver}
 The software system overview is as follows: as with any microcontroller system, it is necessary to first configure the various low level peripherals such as the ADC, PWM, phase synchronization of PWM interrupts, PWM safety trips to avoid over-voltage conditions in our switching circuits, clock and PLL configurations, and etc. The next step in the development was to design a logical, well organized and most importantly, extensible, software system to work with. The firs phase in this development was to develop a state framework for the organization of the various tasks associated with our power conversion system, namely the MPPT algorithm, tasks associated with power-up and shutdown and instances where the power from the solar source is no longer sufficient to meet our output power guarantees. Quite secondarily, we also utilize these state machines to run our LED visual indicators that the code is looping through the FSMs as expected. The high level overview of the software can be seen in Fig. \ref{soft}.
 
