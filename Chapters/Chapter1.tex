@@ -41,6 +41,7 @@ This would add considerably to the complexity of any inverter system seeking to 
 The `deal-breaker' with the square wave inverter is the fact the the spectral content of the output is particularly rich at all odd harmonics of the fundamental. This means that we are left with a bulk of the harmonic content at low frequencies which are particularly hard to filter with analog components. 
 
 \subsection{Linear Control and the PWM approach}
+\label{pwmApproach}
 Compared to square and modified square wave inverters, much of the filtering burden is alleviated due to the fact that spectral content in the vicinity of the fundamental is located near the frequency modulation index of the PWM signal. Pulse-width modulation (PWM), or bang-bang techniques, are a popular means for taking a fixed input voltage and varying the effective power seen at the output. This is done by rapidly switching the input off and on such that the the output is some fraction of the input including zero and one hundred percent. This fraction corresponds to the duty cycle. If we pair the PWM technique with the ability to drive current bidirectionally, say, through an H-Bridge circuit, we can use this technique to trace out a pseudo-sinusoidal output. 
 
 In contrast to the square wave inverters discussed above, with PWM it is possible to vary amplitude and frequency independently. The modulation index, which is given by $m_f=\frac{f_{tri}}{f_{sin}}$ where $f_{tri}$ is the frequency of the triangular carrier frequency, and $f_{sin}$ is the sinusoidal reference signal. 

@@ -1,6 +1,6 @@
 % Chapter 1
 
-\chapter{Software} % Main chapter title
+\chapter{Software Implementation of the Inverter} % Main chapter title
 
 \label{Chapter3} % For referencing the chapter elsewhere, use \ref{Chapter1} 
 
@@ -8,9 +8,14 @@
 
 %----------------------------------------------------------------------------------------
 
-\section{Software and the Hybrid Algorithm}
+\section{The PWM Algorithm}
+In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implemntation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
 
-\subsection{The Hybrid Algorithm}
+Since the DC bus is not regulated by the boost stage feeding the inverter, the inverter itself uses nested control loops; the inner loop is for voltage control, and the outer loop employs current control. The voltage loop is used to provide a reference to the current loop; as the inverter is loaded and current demand increases, it is natural for the voltage to sag. The current reference at any instant is used with a software PID controller to provide the duty cycle to the inverter. To prevent current distortion, the voltage loop is only updated during zero-crossing events.
+
+A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave is generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 100kHz. Using Texas Instruments digital power library blocks, we then generate the sinusoidal reference. The two signals are compare with an onboard analog comparator which is tied to the trip of the PWM signals connected to the H-Bridge. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. 
+
+\section{The Hybrid Algorithm}
 Without being a rehash of Dr. Sanfelice and Jun Chai's paper on the hybrid control of the power inverter\cite{ricardo}, we aim to briefly clarify the mechanisms behind how the hybrid inverter works, and discuss the process we undertook in implementing the algorithm on our custom hardware validation platform. 
 
 The derivation of the hybrid control algorithm is roughly as follows: given that the response of a series RLC filter can be thought of as a linear oscillator with a damping term, and given that we have a set of desired output parameters - namely the amplitude of the output voltage, the amplitude of the output current, and the angular frequency $\omega$, then by solving the resultant linear differential equation, we can derive a reference solution for the given system to a perfect sinusoidal driving signal. In reality we will not have a sinusoidal driver, but rather some permutation of a square wave capable of switching between $+V_{dc}$ and $-V_{dc}$, where $V_{dc}$ is the DC bus voltage at the input to the H-Bridge controlled by the state variable $q$. We consider $q=1$ to correspond to $+V_{dc}$, $q=-1$ to correspond to $-V_{dc}$, and $q=0$ to correspond to $0$.   
@@ -27,10 +32,6 @@ As stated previously, PWM algorithms offer a relatively simple means for analyzi
 \label{jump}
 \end{center}
 \end{figure}
-
-In effect $M1$ and $M2$
-\subsection{Selecting the $\mu$C}
-With the myriad of choices available to designers of power systems, the task of selecting a microcontroller for a power conversion system is no easy task. The first step in making an educated decision as to the choice of controller was to survey the current landscape and find some examples of the most popular microcontroller choices currently being used in power applications today. The controllers that I found most frequently were the dsPic family by Microchip, and the Piccolo family by Texas Instruments. The reasons that these two families have found dominance in this field became obvious: they were low cost, had widespread support, support for 'real-time' control, and excellent libraries available for common power tasks. With the choice narrowed down to two families, it became a simpler task to compare the benefits of both families. Both had similar power consumption, but the TI family of Piccolo controllers came with the option of faster clock speeds, and correspondingly, faster ADC sampling times. Additionally, the resolution of the PWM and ADC modules was higher than those of comparable Microchip controllers. The final check-box in the TI column was the tight integration of the Piccolo family of controllers into two of the power development boards that we were considering. With code portability from our development kit to a final implementation being of paramount importance, it was decided that we should go with the Piccolo family. In particular, we chose the F28035 for its mix of speed, low-cost, and wide array of digital control capabilities including a unique co-processor feature known as the CLA which enables offloading of many control tasks to a secondary chip that can be programmed in assembly. With the integration of this Control Law Accelerator or CLA, we are able to significantly increase the complexity of our algorithms for a given clock speed while running multiple state machines and servicing interrupts occuring at multiple frequencies and to do it \emph{faster} than comparable microcontrollers might be able to.
 
 \subsection{Software System Overview}
 \label{softOver}
