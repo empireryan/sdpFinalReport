@@ -430,6 +430,17 @@ Benjamin \textsc{Chainey}} % Your name - this is used in the title page and abst
 \vfil\vfil\null
 
 }
+
+\newcommand\renunciations[1]{
+\btypeout{Renunciations}
+\addtotoc{Renunciations}
+\thispagestyle{plain}
+\begin{center}{\huge{\textit{Renunciations}} \par}\end{center}
+{\normalsize #1}
+\vfil\vfil\null
+
+}
+
 \newcommand\dedicatory[1]{
 \btypeout{Dedicatory}
 \thispagestyle{plain}

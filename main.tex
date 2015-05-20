@@ -236,11 +236,25 @@ Benjamin's personal acknowledgement:\\
 Everything I strive to achieve rests on the principle foundations of those who have helped me. I am eternally thankful for these people. I extend my gratitude to the Baskin School of Engineering, its faculty and sponsoring organizations for providing the resources and guidance for success in my undergraduate endeavors. To my fellow engineering peers, for their support, motivation, and camaraderie, thank you. To Ryan Rodriguez, this undertaking would not have been possible without you, thank you. Lastly to my family, I remain forever thankful for your support and wisdom.
 
 Ryan Rodriguez' personal acknowledgement:\\
-I would like to thank both the departments of electrical and computer engineering at UC Santa Cruz for offering me one of the most formidable challenges of my life, and the faculty of these departments who have pushed me to reach further than I thought I could. To my peers in the Jack Baskin School of Engineering I extend my best wishes and appreciation for your friendship and support - we did it!
-A special acknowledgement to Ben Chainey for taking this ride with me on  the crowning achievement of our undergraduate career - it has truly been a pleasure. I would like to extend my deepest thanks to my family for offering me their unconditional support and encouragement. In particular, I'd like to thank my mom and brother for helping me to become the man that I am. I owe you both everything. Finally, I'd like to thank my best friend and companion, Lisa Carmack. Thank you for letting me into your world.
+I would like to thank the faculty of both the electrical and computer engineering departments here at the Baskin School of Engineering. This has been one of the most formidable challenges of my life. Thank you all for encouraging me to reach further than I thought I could. To my peers, I extend my best wishes and appreciation for your friendship and support. We did it! A special acknowledgement to Ben Chainey for undertaking this capstone with me - it has truly been a pleasure. I would like to extend my deepest thanks to my entire family for offering me their unconditional support and encouragement. In particular, I'd like to thank my mom and brother for helping me to become the man that I am. I owe you everything. Last, but certainly not least, I'd like to thank my best friend and companion, Lisa Carmack. Thank you for letting me into your world. Sm,~ty.
 
 }
 \clearpage % Start a new page
+
+%----------------------------------------------------------------------------------------
+%	RENUNCIATIONS
+%----------------------------------------------------------------------------------------
+
+\setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
+
+\renunciations{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+
+
+The Hybrid Inverter Team realizes it is unorthodox to include such a section, but we feel it is warranted in this case. Lucas Adams hindered this project and we would like all those who read this paper to know it. 
+
+}
+\clearpage % Start a new page
+
 
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES PAGES
@@ -268,11 +282,15 @@ A special acknowledgement to Ben Chainey for taking this ride with me on  the cr
 \lhead{\emph{Abbreviations}} % Set the left side page header to "Abbreviations"
 \listofsymbols{ll} % Include a list of Abbreviations (a table of two columns)
 {
+\textbf{AC}  & \textbf{A}lternating \textbf{C}urrent\\
+
+\textbf{DC}  & \textbf{D}irect \textbf{C}urrent\\
+
 \textbf{DSP}  & \textbf{D}igital \textbf{S}ignal \textbf{P}rocessor\\
 
-\textbf{ISR}  & \textbf{I}nterrupt \textbf{S}ervice \textbf{R}outine\\
+\textbf{IC}  & \textbf{I}ntegrated \textbf{C}ircuit\\
 
-\textbf{LAH} & \textbf{L}ist \textbf{A}bbreviations \textbf{H}ere \\
+\textbf{ISR}  & \textbf{I}nterrupt \textbf{S}ervice \textbf{R}outine\\
 
 \textbf{PV} & \textbf{P}hoto \textbf{V}oltaic \\
 
@@ -291,10 +309,11 @@ A special acknowledgement to Ben Chainey for taking this ride with me on  the cr
 
 \clearpage % Start a new page
 
-\lhead{\emph{Symbols}} % Set the left side page header to "Symbols"
+\lhead{\emph{Symbols and Constants}} % Set the left side page header to "Symbols"
 
 \listofnomenclature{lll} % Include a list of Symbols (a three column table)
 {
+$h$ & Planck's Constant & $6.6\times10^{-34}(Js)$ \\
 $I$ & Current & A (Cs$^{-1}$) \\
 $P$ & Power & W (Js$^{-1}$) \\
 $V$ & Voltage & V (JC$^{-1}$) \\
@@ -305,6 +324,8 @@ $V$ & Voltage & V (JC$^{-1}$) \\
 & & \\ % Gap to separate the Roman symbols from the Greek
 
 $\omega$ & angular frequency & rads$^{-1}$ \\
+$\lambda$ & wavelength & m \\
+
 % Symbol & Name & Unit \\
 }
 

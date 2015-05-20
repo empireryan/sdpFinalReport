@@ -22,7 +22,7 @@ Finally, we will discuss the steps needed to implement the compensator digitally
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[height = 3in, width = \columnwidth]{boost}
+\includegraphics[height = 2.5in, width = \columnwidth]{boostClean}
 \caption{The Canonical DC-DC Boost Circuit}
 \label{boost}
 \end{center}
@@ -159,14 +159,14 @@ R(1-D) & -(sC+\frac{1}{R}))
 \end{bmatrix}
 \end{equation}
 
-Where $tf$ is given by:
+Where
 \begin{equation}
-s^2RLC + sL + R(1-D)^2
+tf = s^2RLC + sL + R(1-D)^2
 \end{equation}
 
 So we have that 
 \begin{equation}
-\frac{\hat{V_o}}{\hat{\delta}} = \frac{V_o}{(1-D)}[\frac{-sL + R(1-D)^2}{s^2RLC + sL + R(1-D)^2}]
+\frac{\hat{V_o}}{\hat{\delta}} = \frac{V_o}{(1-D)} \bigg\{\frac{-sL + R(1-D)^2}{s^2RLC + sL + R(1-D)^2}\bigg\}
 \end{equation}
 Note the deviation in this result from the previous one obtained by the average dynamic model. We did not utilize this method for designing the feedback loop, but it was a useful and enlightening exercise nonetheless.
 
@@ -229,7 +229,7 @@ After a bit of derivation, we arrive at our final point of analysis, the small s
  
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[height= 3in, width = \columnwidth]{pwmModel}
+\includegraphics[height= 2.5in, width=4in]{pwmModel}
 \caption{Linearized Model of the PWM per Ridley\cite{ridley}}
 \label{pwmModel}
 \end{center}
@@ -238,15 +238,15 @@ After a bit of derivation, we arrive at our final point of analysis, the small s
 The first method is known as voltage mode control, and as its name implies, relies on voltage feedback from the boost circuits output to regulate itself. This technique is problematic for a few reasons. Changes in the loading condition of the circuit must be sensed as an output change first, then get corrected by the feedback loop. This delay results in slow response. Next, The output filter contributes two poles to the control loop requiring either a dominant pole for low frequency roll-off at the error amplifier, or an added zero in compensation.
 Lastly, compensation is complicated by the fact that the loop gain varies with the input voltage.
 
-The preferred method of control for model switching supplies is known as current mode control. As you may have guessed, it operates by sensing current through the inductor, or through the FET switch. This method has the advantages that as its inductor current rises w/ a slope determined by $(V_in-V_o)$ the waveform will respondd immediately to line collage changes eliminating the delayed response and gain variation with changes to the input voltage. Additionally, since the error amplifier if now used to command an output current rather than an output voltage, the effect of loading is minimized and only a single pole is contributed to the feedback loop. This allows for simpler compensation and higher bandwidth over a comparable voltage mode controller. 
+The preferred method of control for model switching supplies is known as current mode control. As you may have guessed, it operates by sensing current through the inductor, or through the FET switch. This method has the advantages that as its inductor current rises with a slope determined by $(V_{in}-V_o)$ the waveform will respond immediately to line voltage changes eliminating the delayed response and gain variation with changes to the input voltage. Additionally, since the error amplifier if now used to command an output current rather than an output voltage, the effect of loading is minimized and only a single pole is contributed to the feedback loop. This allows for simpler compensation and higher bandwidth over a comparable voltage mode controller. 
 
-Dr. Ridley's model is designed with current mode control in mind. We will omit a lengthy coverage of the entire 200 page dissertation, but will include the critical results - namely, that the transfer function of a buck converter is found to be:
+Dr. Ridley's model is designed with current mode control in mind. His analysis shows that the transfer function of a boost converter is found to be:
 
 \begin{equation}
-f_p(s)=\frac{k[1 + \frac{s}{w_z}][1 - \frac{s}{w_{z,RHP}}]}{[1 + \frac{s}{w_p}]}
+f_p(s)=\frac{k[1 + \frac{s}{\omega_z}][1 - \frac{s}{\omega_{z,RHP}}]}{[1 + \frac{s}{\omega_p}]}
 \end{equation}
 
-Where $omega_p = \frac{2}{RC}$,$w_z = \frac{1}{R_cC}$,$R_c$ is the ESR of the cap, and $W_{z,RHP} = \frac{R(1-D)^2}{L}$.
+Where $\omega_p = \frac{2}{RC}$, ~$\omega_z = \frac{1}{R_cC}$, ~$R_c$ is the ESR of the cap, and $\omega_{z,RHP} = \frac{R(1-D)^2}{L}$.
 
 The difference between the average inductor current and the dc value of the sampled inductor current can cause instability for certain operating conditions. This instability is known as sub-harmonic oscillation, which occurs when the inductor ripple current does not return to its initial value by the start of next switching cycle. These oscillations are characteristic of boost circuits using current mode control. Sub-harmonic oscillation is normally characterized by observing alternating wide and narrow pulses at the switch node. This term contributes to the total transfer function and is given by:
 
@@ -266,7 +266,7 @@ Q_p = \frac{1}{\pi(m_cD^{'}-1/2)}
 
 Where $V_{on}$ is the inductor voltage with the switch on, and $R_i$ is the gain from the inductor current, implying that $R_i$ is the sense resistor.
 
-Therefore, the total transfer function given by Ridley in [\cite{ridley}]is found to be:
+Therefore, the total transfer function given by Ridley in \cite{ridley} is found to be:
 
 \begin{equation}
 \label{thirdOrder}
@@ -297,7 +297,6 @@ k_{c} = \frac{\omega_z}{|G_{ps}(s)|_{f_c}}\\
 \end{gather*}
 
 By selecting a resonable crossover frequency $f_c$, we can calculate the require parameters of this expression. The resulting compensator is shown in Fig. \ref{lagRidley}.
-
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[height= 3in, width = \columnwidth]{lagRidley}
@@ -305,7 +304,6 @@ By selecting a resonable crossover frequency $f_c$, we can calculate the require
 \label{lagRidley}
 \end{center}
 \end{figure}
-
 Finally, calculating the close loop with compensator, we get the stabilized system shown in the third panel of Fig. \ref{composite}. 
 
 \begin{figure}[htbp]
@@ -329,5 +327,5 @@ For a closer inspection, see Fig. \ref{gpMargin} which clearly shows the gain an
 \section{2P2Z}
 As we can see, the lag compensator was simply a special case of PI control. A 2P2Z can implement the continuous time version by way of a bilinear or Tustin transformation. The rule for the bilinear transform is that $s\leftarrow\frac{2z-1}{Tz+1}$, Performing this transformation on our controller equation results in an expression of the same form, implementable in assembly on a C2000 Piccolo micro controller by Ti. A toll recommended by TI is the Biricha tool that takes the placement of your poles and zeroes and converted them to the necessary coefficients for the micro.
 
-\section{Boost Controller Conclusion}
+\section{Concluding Remarks on the Boost Controller}
 After a fairly exhaustive review of the literature regarding the accuracy of the linearized DC boost model, and the control theory behind their employment in SWMPS, We were able to get favorable results in simulation, namely a stable system. While there are multiple methods for linearizing the boost circuit, the most widely accepted models today utilize that of Dr. Ridley's due to its highly accurate predictions. This model was used in the design of a lag compensator. The Final phase involved the conversion of my linear model to a discrete model suitable for implementation on a micro controller.
