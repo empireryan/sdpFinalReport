@@ -13,7 +13,6 @@
 The inverter is responsible for converting the DC power output of the photovoltaic (PV) panels into the AC power used in electric grids worldwide. The microinverter has three main power conversion stages, nameley the boost, inverter, and output filter. The boost converter steps up the relatively low voltage sourced from the PV panels while implementing maximum power point tracking to keep the system operating near peak efficiency - this stage is critical for maintaining maximum efficiency in the face of the non-linear characteristics of the PV system. The inverter consists of an H-Bridge and transistor driver hardware that creates the AC wave from the high voltage DC bust output of the boost. The output filter removes high frequency switching noise and passes the 60Hz intended for standard loads.  Feedback control operation requires voltages and currents to be measured in real time by the microcontroller analog-to-digital converter. Logic and signal conditioning power is sourced through an auxiliary power supply which steps down solar input voltage. The system diagram is shown in Figure~\ref{solarBlock}.
 
 \section{Photovoltaics}
-@todo: talk about solar panels, how they work, nature of the output.  
 Photovoltaics, more commonly known as solar panels, operate by the principle known as the photoelectric effect. This description of this phenomena won Albert Einstein the Nobel prize in 1905. In this work, he described the quantized energy carried by photons. This energy was found to be $E=hv$, where $h$ is Plancks constant.
 
 If we have a pn junction with a thin, heavily dope $n$ region, then a depletion region between the two materials results. This region is observed to extend primarily into the $p$ region with an electric field $E_0$. While we need electrodes to construct a `bulk' solar cell, these electrodes must also allow light to enter the device. This is typically done by forming electrodes into thin finger like structures on the surface. Additionally, antireflective coatings are typically applied to maximize light incident upon the device \cite{materials}.
@@ -22,14 +21,13 @@ If we engineer a semiconducting material with a bandgap tuned to the wavelengths
 
 The engineering of semiconducting materials that can interact with broad ranges of wavelengths is the subject of much research, but is entirely beyond the scope of this report. Rather, we are more concerned with harnessing the DC photocurrents from PV systems readily available today and turning them into alternating currents. 
 
-In order to achieve this goal, we must understand the non-linear nature of 
 \subsection{Logic Power Supply}
-A logic power supply was required for the inverter board to run the microcontroller, driver circuits, peripheral sensor network. Three different voltage rails were needed at 12V, 5V and 3.3V. The input from the solar panel was utilized to create these different power rails through a small connection circuit. Efficiency of this type of system is considered crucial, so cascaded switching DC/DC buck converters were used to create the 12V and 5V rails. A fast responding low-dropout linear regulator created the final 3.3V from the 5V rail. The circuit schematic for the logic power supply is shown in Figure~\ref{logic power fig}.
+A logic power supply is required for the inverter board to run the microcontroller, driver circuits, and peripheral sensor network. Three different voltage rails were needed at $12V$, $5V$ and $3.3V$. The input from the solar panel was utilized to create these different power rails through a small connection circuit. Efficiency of this type of system is considered crucial, so cascaded switching DC/DC buck converters were used to create the $12V$ and $5V$ rails. A fast responding low-dropout linear regulator created the final $3.3V$ from the $5V$ rail. The circuit schematic for the logic power supply is shown in Figure~\ref{logic power fig}.
 
-A variety of features were added to this front input interface for system protection and functionality. There are two options for sourcing power to the inverter board: banana jack connections for solar input and a DC barrel jack plug for testing input. These two circuits are configured so that only the barrel jack will source power if both happened connected and energized at the same time. Two switches are included for toggling the DC jack input and for switching conversion power into the main system. A ten amp blow fuse is included in series with the input to the inverter to prevent damaging short circuit conditions. A green LED on the 3.3V rail turns on to show the system is properly functioning.
+A variety of features were added to this front input interface for system protection and functionality. There are two options for sourcing power to the inverter board: banana jack connections for solar input and a DC barrel jack plug for testing input. These two circuits are configured so that only the barrel jack will source power if both happened connected and energized at the same time. Two switches are included for toggling the DC jack input and for switching conversion power into the main system. A ten amp blow fuse is included in series with the input to the inverter to prevent damaging short circuit conditions. A green LED on the $3.3V$ rail turns on to show the system is receiving power.
 
 \subsection{Boost Converter}
-A standard PV microinverter contains two principle energy conversion stages with a DC/DC module and DC/AC module. This section highlights the design process of a DC/DC boost converter for solar microinverter implementations. The boost circuit includes many elements and considerations of the final inverter system including power switching hardware and sensor circuits.
+A standard PV microinverter contains two principle energy conversion stages with a DC/DC module and DC/AC module. This section highlights the hardware design process of a DC/DC boost converter for solar microinverter implementations. The boost circuit includes many elements and considerations of the final inverter system including power switching hardware and sensor circuits.
 
 The boost stage designed is essential for photovoltaics since it allows consistent maximum power sourcing from the panel. Solar panels have nonlinear relationships between output voltage and current. The maximum power product of the electrical values will vary depending on light intensity levels, loading, and temperature. A microcontroller unit (MCU) is used with this boost converter for create a feedback control scheme called a maximum power point tracker (MPPT). A versatile DC/DC boost stage is needed for microinverters since it can dynamically vary power switching based on the MPPT to compensate for the wide range of potential solar panel voltages. This converter topology utilizes a discrete MOSFET for switching since microcontroller interfacing is required. Traditional boost converter integrated circuits (ICs) do not satisfy the MPPT control needs or power requirements needed for this type of system.  
 
@@ -71,7 +69,7 @@ The electrical specifications of this boost converter are listed in Table~\ref{T
 \label{Table 1}
 \end{table}
 
-The Sharp solar panels, utilized in this design as an input power source, will have varying voltage and current output capabilities depending on lighting conditions. Maximum output power for the 170W panels occurs at $V_{panel}=34.8V$ and  $I_{panel} = 4.9A$. A input voltage range will be selected to define a sourcing range with usable power output considering the panels highly nonlinear relationship regarding I vs V shown in Figure~\ref{Figure 4}. Output voltage is defined based on the minimum value needed for the 120Vrms/0.707 = 169.73V peak value needed for the DC/AC inverter stage input. Maximum power of 200W is an upper limit buffer set for this design considering the solar panel approach with microinverter topology. Switching frequency is set at 50 kHz based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
+The Sharp solar panels, utilized in this design as an input power source, will have varying voltage and current output capabilities depending on lighting conditions. Maximum output power for the 170W panels occurs at $V_{panel}=34.8V$ and  $I_{panel} = 4.9A$. An input voltage range will be selected to define a sourcing range with usable power output considering the panels highly nonlinear relationship regarding I vs V shown in Figure~\ref{Figure 4}. Output voltage is defined based on the minimum value needed for the 120Vrms/0.707 = 169.73V peak value needed for the DC/AC inverter stage input. Maximum power of 200W is an upper limit buffer set for this design considering the solar panel approach with microinverter topology. Switching frequency is set at 50 kHz based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
 
 \begin{figure}
 \centering
@@ -80,7 +78,7 @@ The Sharp solar panels, utilized in this design as an input power source, will h
 \label{Figure 4}
 \end{figure}
 
-The process of designing the boost circuit hardware involved research of reference application notes and in running PSPICE simulations. PSPICE computer software produced by Cadence\textbackslash{}OrCAD was used to simulate the boost converter circuit. The max power voltage of the PV panels was selected for primary simulation testing. Calculations were performed to best select power components for operations of the boost converter at high power values. These design steps considered power dissipation thermal limits, critical inductance, and critical capacitance. The PSPICE circuit encapsulating the entire boost converter design is shown in Figure~\ref{boostCrct}.
+The process of designing the boost circuit hardware involved research of reference application notes and in running PSPICE simulations. PSPICE computer software produced by Cadence\textbackslash{}OrCAD was used to simulate the boost converter. The max power voltage of the PV panels was selected for primary simulation testing. Calculations were performed to best select power components for operations of the boost converter at high power values. These design steps considered power dissipation thermal limits, critical inductance, and critical capacitance. The PSPICE circuit encapsulating the entire boost converter design is shown in Figure~\ref{boostCrct}.
 
 \begin{figure}
 \centering
@@ -107,7 +105,7 @@ This boost converter was designed to operate in continuous condition mode (CCM).
 \label{Figure c}
 \end{figure}
 
-Another factor that will influence the switching of the MOSFET is the maximum power-point tracking (MPPT) algorithm implemented by the microcontroller. This works to vary the input impedance of the converter as seen by the panel to optimize power output at 34.8V. This method uses feedback control based on the voltage and currents measured by the ADC to perturb and observe the boost condition. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%.
+Another factor influencing the switching of the MOSFET is the maximum power-point tracking (MPPT) algorithm implemented by the microcontroller. This works to vary the input impedance of the converter as seen by the panel to optimize power output at 34.8V. This method uses feedback control based on the voltage and currents measured by the ADC to perturb and observe the boost condition. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%.
 
 Ratings on voltages and currents concerning components were determined through worst case calculations.\cite{kwasinski} 
 \begin{equation}
@@ -122,7 +120,7 @@ I_L = I_{diode} = I_{drain} = \frac{2}{\sqrt[2]{3}}I_{in,rms}
 \begin{equation}
 I_{cap} = I_{out,rms} = 1.18A 
 \end{equation}
-The clamp diode was selected to be a SiC schottky type since it offers fast recovery times with low reverse recovery charge $Q_{rr}$ for reduced switching losses. Since the diode resides in the power conduction path, energy dissipation was analyzed. The diode was modeled as a series circuit of a temperature dependent voltage source $ V_{diode}$ and resistance $R_{diode}$.\cite{CREE}
+The clamp diode was selected to be a Silicon Carbide (SiC) schottky type since it offers fast recovery times with low reverse recovery charge $Q_{rr}$ for reduced switching losses. Since the diode resides in the power conduction path, energy dissipation was analyzed. The diode was modeled as a series circuit of a temperature dependent voltage source $ V_{diode}$ and resistance $R_{diode}$.\cite{CREE}
 \begin{equation}
  V_{diode} = \alpha T_{junction}+V_{diode,0} =  0.95V 
 \end{equation}
@@ -142,7 +140,7 @@ P_{switching} = Q_{c,diode}V_{out}f_{sw}=0.14W
  P_{dissipation,diode,total}= P_{conduction}+P_{switching}=2.91W 
 \end{equation}
 This power dissipation falls within the limits of the diode, but for good measure it will be heat sinked with a TO-220 bolt-on type sink and thermal grease. 
-	The output capacitance was designed as a parallel arrangement of two types of capacitors for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance limit. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.%\cite{hasaneen}
+	The output capacitance was designed as a parallel arrangement of two types of capacitors for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance limit. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
 \begin{equation}
 Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
 \end{equation}
@@ -150,7 +148,7 @@ Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\%
 C_{critical} \ge \frac{V_{out}D}{F_{sw}\delta V_{out}R_{load,maxpower}} = 370 \mu F
 \end{equation}
 
-Additionally, the continuous conduction mode requirement sets a minimum valued critical inductance. This was calculated to ensure current always remained flowing through the inductor.%\cite{hasaneen}
+Additionally, the continuous conduction mode requirement sets a minimum valued critical inductance. This was calculated to ensure current always remained flowing through the inductor.\cite{hasaneen}
 
 \begin{equation}
  L_{critical} \ge \frac{R_{load,maxpower}D(1-D)^2}{2f_{sw}}= 50 \mu F
@@ -187,7 +185,7 @@ A first order estimate of the boost’s efficiency, with the above three loss co
 
 This is an optimistic conversion efficiency and does not fully encapsulate an array of other possible factors such as component tolerances and capacitive equivalent series resistances. A deviation of 10\% is a fair engineering estimate on how much this efficiency could drift.
 
-The boost converter circuit prototype allows efficiency testing under the constraints of a laboratory environment. Efficiency is calculated with the relationship shown in the following equation. The operating parameters of the test are: V_{in} = 12V, R_{load} = 477.66 $\Omega$ , F_{switching} = 50 kHz. 
+The boost converter circuit prototype allows efficiency testing under the constraints of a laboratory environment. Efficiency is calculated with the relationship shown in the following equation. The operating parameters of the test are: $V_{in} = 12V$,~ $R_{load} = 477.66\Omega$ , $F_{switching} = 50 kHz$. 
 
 \begin{equation}
 \eta_{exp} = efficiency_{experimental} = \frac{P_{out}}{P_{in}} = \frac{{V_{out}}^2{R_{load}}}{{V_{in}}{I_{in}}}
