@@ -7,6 +7,85 @@
 \lhead{Chapter 5. \emph{Analysis and Conclusion}} % This is for the header on each page - perhaps a shortened title
 
 %----------------------------------------------------------------------------------------
+\section{Fourier Analysis}
+One of the most pressing concerns regarding switching power supplies is the spectral content of the output signal, both before and after filtering. This is of chief concern to power systems designers because the demands that excess spectral content can place on filtering increase size, weight, and cost of the inverter system. These additional frequencies represent energy that must be dissipated by the filter, and hence an inefficiency in our system. A comparative analysis of the dominant PWM techniques is necessary to understand the costs and benefits of each technique, but more importantly for the purpose of this paper, to understand how the hybrid algorithm used to modulate pulse-widths stacks up. In this section we lean heavily on the work of \cite{fourierAnalysis}.
+
+Recall that any signal can be decomposed into a sum of sines and cosines given by the expression:
+\begin{equation}
+f_N(\omega t) = \frac{a_0}{2} + \sum_{n=1}^N \left(\overbrace{a_n}^{A_n \sin(\phi_n)} \cos(n\omega t) + \overbrace{b_n}^{A_n \cos(\phi_n)} \sin(n\omega t)\right)\\
+= \sum_{n=-N}^N c_n\cdot e^{in\omega t}
+\end{equation}
+
+Where
+
+\begin{equation}
+c_n \ \stackrel{\mathrm{def}}{=} \ \begin{cases}
+\frac{A_n}{2i} e^{i\phi_n} = \frac{1}{2}(a_n - i b_n) & \text{for } n > 0 \\
+\frac{1}{2}a_0 & \text{for }n = 0\\
+c_{|n|}^*  & \text{for } n < 0.
+\end{cases}
+\end{equation}
+
+The Fourier coefficients of a signal can be found using:
+\begin{align*}
+& ~~~~~ a_0 = \frac{1}{T}\int_{0}^{T}f(t)dt \\
+a_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \cos(n\omega t)\ dt \\
+b_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \sin(n\omega t)\ dt \\
+c_n &= \frac{1}{T}\int_{t_0}^{t_0+T} f(t)\cdot e^{-in\omega t}\ dt
+\end{align*}
+The magnitude of every harmonic of the fundamental can be found by:
+
+\begin{align*}
+K_0 &= \frac{\frac{a_0}{2}}{2} \\
+K_n &= \sqrt{a_n^2+b_n^2}
+\end{align*}
+
+Note that in all cases it is understood that $n\in \mathbb{Z}$.
+
+Additionally, because direct application of the Fourier analysis can be cumbersome, the analysis of less friendly waveforms can be simplified by the application of the following properties of symmetry.
+
+For \textbf{odd symmetry}, that is, functions satisfying the equality $f(t)=-f(-t)$ it is given that:
+\begin{equation}
+\begin{cases}
+a_n = 0 \\ 
+b_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t
+\end{cases}
+\end{equation}
+
+For \textbf{half-wave symmetry}:
+\begin{equation} 
+\begin{cases} 
+C_n = 0 &\mbox{for even n}  \\ 
+a_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\cos(n\omega t)d\omega t &\mbox{for odd n}  \\
+b_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t &\mbox{for odd n} 
+\end{cases}
+\end{equation}
+
+This condition holds when $f{\omega t} = -f(-\omega t + \frac{T}{2})$.
+
+And for \textbf{quarter-wave symmetry}:
+\begin{equation} 
+\begin{cases} 
+a_0 = 0 \\
+a_n = 0 &\text{for even n}  \\
+a_n = \frac{8}{T}\int{0}^{\frac{T}{4}}\cos{n\omega t} &\mbox{for odd n}  \\
+b_n = 0 &\mbox{for all n} 
+\end{cases}
+\end{equation}
+Quarter-wave symmetry holds for signals possessing half-wave symmetry, and also symmetry about the midpoint of the positive and negative half cycles.
+
+\subsection{Total Harmonic Distortion and Electromagnetic Interferance}
+One of the most common metrics for assessing the quality of a signal is the total harmonic distortion (THD.) The THD is given by the expression:
+\begin{equation}
+THD=\frac{\sqrt{\sum_{2}^{\infty}}(V_n^2)_{rms}}{(V_1)_{rms}} = \frac{V_{rms}^2-{V_1}^2_{rms}}{{V_1}_{rms}} = \frac{\sqrt{K_0^2+K_1^2+\ldots+K_n^2}}{K_1}\cdot100\%
+\end{equation} 
+\todo{rewrite this graph completely!}
+Where ${V_n}_{rms}$ is the rms value of the n's harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component. To reduce undesired harmonics in the inverter output, a low THD value is desirable in PWM modulation. By using Fourier series, the determination of THD of a certain output is easy to obtain because magnitude of each harmonics (Cn ) can be calculated.
+
+\subsection{Bipolar PWM}
+\subsection{Unipolar PWM}
+\subsection{Modified Unipolar PMW}
+\subsection{Hybrid PWM}
 
 \section{PWM}
 
