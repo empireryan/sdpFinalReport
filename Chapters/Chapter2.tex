@@ -8,24 +8,29 @@
 
 %----------------------------------------------------------------------------------------
 
-\section{Inverter System Overview}
+\section{Inverter Systems Overview}
 
-Power inverters are used for converting DC power output of photovoltaic (PV) panels, batteries, or other DC sources into the AC power used in power grids worldwide. Our microinverter has three main power conversion stages, namely the DC/DC boost, H-bridge, and output filter. The boost converter steps up the relatively low voltage sourced from the PV panels while implementing maximum power point tracking to keep the system operating near peak efficiency - this stage is critical for maintaining maximum efficiency in the face of the non-linear characteristics of the PV system. The boost circuit trades current for voltage much like a transformer circuit by harvesting the inductive kick of an inductor hooked up to a switch. By $V=L\frac{\delta i}{\delta t}$, we see that the faster we can change current through the inductor, the larger voltage spike we can capture. This `capture' is done with a diode and capacitor circuit. What we refer to as `the inverter' consists of an H-Bridge and transistor driver hardware that creates the pseudo-sinusoidal wave from the high voltage DC output of the boost. The output filter removes high frequency switching noise and passes the 60Hz intended for standard loads. In all but the most trivial cases, feedback control is necessary to maintain constant outputs where there are varyiable loading conditions. Voltage and current measurements are done in near real-time by the microcontroller's analog-to-digital converter (ADC). 
+Power inverters are used for converting DC power output of photovoltaic (PV) panels, batteries, or other DC sources into the AC power used in power grids worldwide. Our microinverter has three main power conversion stages, namely the DC/DC boost, H-bridge, and output filter. The boost converter steps up the relatively low voltage sourced from the PV panels while implementing maximum power point tracking to keep the system operating near peak efficiency - this stage is critical for maximizing return on investment in the face of the non-linear characteristics of the PV system. The boost circuit trades current for voltage, much like a transformer, by harvesting the inductive kick of an inductor hooked up to a switch. By the fundamental relationship
+\begin{equation}
+V=L\frac{\delta i}{\delta t}
+\end{equation}
+ we see that the faster we can change current through the inductor, the larger voltage spike we can capture. This `capture' is done with a diode and capacitor circuit. What we refer to as `the inverter' consists of an H-Bridge and transistor driver hardware that creates the pseudo-sinusoidal wave from the high voltage DC output of the boost. The output filter removes high frequency switching noise and passes the 60Hz intended for standard loads. In all but the most trivial cases, feedback control is necessary to maintain constant outputs where there are varyiable loading conditions. Voltage and current measurements are done in near real-time by the microcontroller's analog-to-digital converter (ADC).   
 
 Logic power is sourced from the solar panel via an integrated buck converter IC; a buck converter is an efficient means of converting high DC voltages into much smaller ones without generating an excess of waste heat, as is typical with LDO regulators. The buck converter steps input voltage down from approximately $35-45V$ to $12V$. To combat the relatively high harmonic content of the buck converter, we use LDO's to produce stable $5v$ and $3.3V$ rails for the supporting cast of hardware on our inverter - namely, the microcontroller, FET gate drivers, and op-amp sensing circuits. The system diagram is shown in Figure~\ref{solarBlock}.
 
+The inverter is of central concern in this work, and in particular, the pseudo-sinusoidal waveforms that result from our control scheme. These were mentioned briefly in Sections \ref{squareApproach}, \ref{pwmApproach}, and \ref{hybridApproach}, but will be discussed in detail in Chapter \ref{Chapter5}, Section \ref{fourier}.
+
 \subsection{Logic Power Supply}
+\todo[inline]{Ben wrote this}
 A logic power supply is required for the inverter board to run the microcontroller, driver circuits, and peripheral sensor network. Three different voltage rails were needed at $12V$, $5V$ and $3.3V$. The input from the solar panel was utilized to create these different power rails through a small connection circuit. Efficiency of this type of system is considered crucial, so cascaded switching DC/DC buck converters were used to create the $12V$ and $5V$ rails. A fast responding low-dropout linear regulator created the final $3.3V$ from the $5V$ rail. The circuit schematic for the logic power supply is shown in Figure~\ref{logic power fig}.
 
 A variety of features were added to this front input interface for system protection and functionality. There are two options for sourcing power to the inverter board: banana jack connections for solar input and a DC barrel jack plug for testing input. These two circuits are configured so that only the barrel jack will source power if both happened connected and energized at the same time. Two switches are included for toggling the DC jack input and for switching conversion power into the main system. A ten amp blow fuse is included in series with the input to the inverter to prevent damaging short circuit conditions. A green LED on the $3.3V$ rail turns on to show the system is receiving power.
 
 \subsection{Boost Converter}
-A standard PV microinverter contains two principle energy conversion stages with a DC/DC module and DC/AC module. This section highlights the hardware design process of a DC/DC boost converter for solar microinverter implementations. The boost circuit includes many elements and considerations of the final inverter system including power switching hardware and sensor circuits.
+\todo[inline]{Ben wrote this}
+A standard PV microinverter contains two principle energy conversion stages with a DC/DC module and DC/AC module. This section highlights the hardware design process of a DC/DC boost converter for solar microinverter implementations. The boost circuit includes many elements and considerations of the final inverter system including power switching hardware and sensor circuits. The boost stage designed is essential for photovoltaics since it allows consistent maximum power sourcing from the panel. Solar panels have nonlinear relationships between output voltage and current. The maximum power product of the electrical values will vary depending on light intensity levels, loading, and temperature. A microcontroller unit (MCU) is used with this boost converter for create a feedback control scheme called a maximum power point tracker (MPPT). A versatile DC/DC boost stage is needed for microinverters since it can dynamically vary power switching based on the MPPT to compensate for the wide range of potential solar panel voltages. This converter topology utilizes a discrete MOSFET for switching since microcontroller interfacing is required. Traditional boost converter integrated circuits (ICs) do not satisfy the MPPT control needs or power requirements needed for this type of system.  \todo{this whole paragraph needs work. Think about our audience being pretty smart guys, try to use some economy with your words}
 
-The boost stage designed is essential for photovoltaics since it allows consistent maximum power sourcing from the panel. Solar panels have nonlinear relationships between output voltage and current. The maximum power product of the electrical values will vary depending on light intensity levels, loading, and temperature. A microcontroller unit (MCU) is used with this boost converter for create a feedback control scheme called a maximum power point tracker (MPPT). A versatile DC/DC boost stage is needed for microinverters since it can dynamically vary power switching based on the MPPT to compensate for the wide range of potential solar panel voltages. This converter topology utilizes a discrete MOSFET for switching since microcontroller interfacing is required. Traditional boost converter integrated circuits (ICs) do not satisfy the MPPT control needs or power requirements needed for this type of system.  
-
-
-A generic boost converter circuit shown in Figure~\ref{Figure 3}. Operation of a boost converter has two distinct phases depending on the switch mode of the power MOSFET. The gate of the MOSFET is sent different logic values at specific duty cycles through PWM. When the drive circuit outputs logic high in Figure 3, the drain to source path will conduct in the saturation region. This provides a path to ground for the current flowing through the inductor and reverse biases the clamp diode. Over time energy is built up in the magnetic field of the inductor coil from this solar panel sourced current. Then logic low is sent to the MOSFET to shut it down. Considering the sudden change in current flow, a large voltage kickback occurs across the inductor and forward biases the diode. Current now can flow to charge the output capacitor and feed the load.
+A generic boost converter circuit shown in Figure~\ref{Figure 3}. Operation of a boost converter has two distinct phases depending on the switch mode of the power MOSFET. The gate of the MOSFET is sent different logic values at specific duty cycles through PWM. When the drive circuit outputs logic high in Figure 3 \todo{no-no}, the drain to source path will conduct in the saturation region. This provides a path to ground for the current flowing through the inductor and reverse biases the clamp diode. Over time energy is built up in the magnetic field of the inductor coil from this solar panel sourced current. Then logic low is sent to the MOSFET to shut it down. Considering the sudden change in current flow, a large voltage kickback occurs across the inductor and forward biases the diode. Current now can flow to charge the output capacitor and feed the load.
 
 \begin{figure}
 \centering
@@ -34,10 +39,9 @@ A generic boost converter circuit shown in Figure~\ref{Figure 3}. Operation of a
 \label{Figure 3}
 \end{figure}
 
-
 When the MOSFET is conducting, the output capacitor provides power to the load until it receives new charge during the second period. Due to the switching characteristics and inductor physics, a large ripple current flows through the inductor. An important design constraint it to make sure the inductor current always remains greater than zero such that continuous conduction mode (CCM) is maintained. CCM ensures a desired voltage transfer function for gain in this design. Additionally, there are some parasitic elements included in the circuit that contribute to power loss. These undesired effects include the DC resistance of the inductor windings and the equivalent series resistance of the capacitor.  
 The electrical specifications of this boost converter are listed in Table~\ref{Table 1}. \\ 
-
+\todo{the rest of this section needs work too}
 
 \begin{table}
 \centering
@@ -250,7 +254,7 @@ L > \frac{V_c}{I_l\omega^2}
 
 The expression obtained in \ref{constraint} adds a considerable degree of inductance compared to that in a typical PWM inverter. It was considered initially that the quality factor, $Q$ might be at work in the conditions on the filter, but we find that the quality factor for the series RLC filter is given as $Q = \frac{1}{R}\sqrt{\frac{1}{LC}}$, and the analysis in \cite{ricardo} makes no mention of the damping term $R$.
 
-\section{Feedback Sense}
+\subsection{Feedback Sense}
 The output sensors are an important part for the operation of the inverter since they allow the microcontroller to monitor the output voltages and currents for feedback control. There are eight sensor circuits at the inverter stage and the output filter. The H-bridge portion of the circuit creates the 60 Hz sinusoid signal and this signal requires a variety of sensors considering its oscillatory nature. These signal conditioning circuits are made from passive components and integrated circuit packages to break down high power signals into voltages suitable for microcontroller sampling. 
 	
 After the H-bridge is the output filter which has two AC hot outputs for input into the setup transformer. Considering the size of the filter components, they reside on a daughter board separate from the main inverter board. The output power signals have reference jumpers that connect back to the main board after the filtering. The voltages on these two AC lines are measured through two basic voltage dividers. Given their alternating waveforms, the signals will swing below the ground reference potential periodically. Measuring this effect is achieved through the use of a differential operational amplifier circuit configuration with the scaled AC output voltages used as inputs. The amplifier's input signals are brought up with a DC offset of 1.65V to allow the negative potential swings of the AC signal to be measured. The sine wave crosses the 1.65V raised signal ground threshold 60 times a second during normal operation. These points are considered as zero crossings and a comparator integrated circuit is present for their detection. The comparator compares the output signal of the differential op-amp to the 1.65V reference and outputs logic high to the microcontroller when the signals match.
@@ -259,7 +263,7 @@ The input to the H-bridge has a DC voltage resistive divider to monitor its curr
 
 @todo: discuss all the sensors here
 
-\section{The Microcontroller}
+\subsection{The Microcontroller}
 At the core of our inverter system is the Texas Instruments F28035 `Piccolo' microcontroller. This embedded controller's internal architecture is optimized for the real time control of devices like switching power converters. The Piccolo has a control law co-processor that can operate complex feedback loops without burdening the main processor, freeing the central unit to perform higher level tasks. The device also features versatile pulse width modulation units which are connected to the general purpose outputs for driving the switching power transistors of the boost converter and H-bridge. 
 
 With the myriad of choices available to designers of power systems, the task of selecting a microcontroller for a power conversion system is no easy task. The first step was to survey the current landscape and find some examples of the most popular microcontroller choices currently being used in power applications today. The controllers that we found most frequently were the dsPic family by Microchip, and the Piccolo family by Texas Instruments. The reasons that these two families have found dominance in this field became obvious: they were low cost, had detailed documentation and application notes for power conversion, and support for the 'real-time' control loops that our application demands.
@@ -270,7 +274,7 @@ With code portability from our development kit to a final implementation being o
 
 Our final hardware design includes anti-aliasing filters for all ADC inputs, and is capable of outputting the values measured at the ADC to DAC pins for debugging purposes. The system uses a 20MHz crystal to set the pace for a phase-locked system clock of 60MHz. External hardware in support of the microcontroller includes voltage protection diodes on GPIO and ADC pins, and isolated communication circuits allowing for the use of USB debugging while protecting against ground loops.
 
-\subsection{USB-JTAG interface}
+\subsubsection{USB-JTAG interface}
 The Piccolo microcontroller supports JTAG boundary scanning for device programming and real time debugging. To connect through the JTAG circuit, several integrated circuit solutions are implemented on our inverter. Controller programming from code compiled on a workstation necessitates a USB connection to the inverter board. A Future Technology Devices International (FTDI) IC FT2232D is used to interface a standard USB with the micro by converting the signals to UART. This device also allows the configuration of an EEPROM flash memory array for proprietary Texas Instruments XDS100 debugger program information. The USB connection provides its own power to the JTAG conversion circuit, so galvanic isolation is used between the USB power supply and that of the main inverter board. Digital signals are sent between the two subsystems through a series of digital isolator ICs which use capacitive coupling. A Texas Instruments IC MAX3221 is present as an RS-232 driver/receiver for the serial RX and TX connections between the FTDI chip and the microcontroller.
 
 \section{Photovoltaics}
@@ -303,9 +307,11 @@ Drawing maximum power from the solar unit requires a specific DC load which opti
 Solar cells each typically produce under 1V, so multiple cells are be connected in series to create a panel with a useful voltage range. The forward diode in the cell's circuit model has the possibility of drawing current from neighboring cells when they are collected in parallel. Reversed blocking diodes are placed within the panel circuit to mitigate this as the individual cell outputs vary. The complete solar panel features many submodules of solar cells connected to a DC bus network which are then interface with polarized output leads.
 
 \section{The Hybrid Inverter Team Development Board}
+The Hybrid Inverter Team's development board aims to be a higher power replacement for TI's Solar Explorer development board with several key changes. Several of the auxiliary modules included with the Solar Explorer that were unnecessary for our design were omitted. The omitted modules included the second microcontroller for solar panel emulation, as well as the SEPIC converter used for battery charging. With the already lofty goal of building a full switch-mode boost and inverter, we felt it would be a great deal of added complexity to build, code, and troubleshoot the SEPIC battery charger for our senior design project. The panel emulator was unnecessary since we would either be running the board from an ATX power supply, or a real solar panel.
+
 Our PCB layouts utilized a four layer design with power and ground planes on the two middle layers. Multiple layers allowed for components to be placed closer together, and achieve a smaller overall form factor while allowing for higher current carrying capabilities. Additionally, we were able to use polygon pours on the central power layers to boost current carrying capacity and aid in the dissipation of heat. Ground plane isolation was used to separate areas with switching power signal and digital logic.
 
-Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}. 
+Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey\todo{just do me a favor and read this}. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}.\todo{really need to work on the wording o this paragraph} 
 
 \begin{figure}
 \centering
@@ -324,7 +330,10 @@ The inverter sits in an enclosure mounted to the back of a solar panel to follow
 \label{solar stand}
 \end{figure}
 
+\subsection{Revision One}
+Revision one 
+First, we opted to omit the control card socket for a full microcontroller layout with a JTAG interface for debugging. Second, we omitted s
 
-
+\subsection{Revision Two}
 
 

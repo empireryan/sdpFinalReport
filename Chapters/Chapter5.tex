@@ -1,6 +1,6 @@
 % Chapter 5
 
-\chapter{Analysis and Conclusion} % Main chapter title
+\chapter{Analytical and Experimental Results} % Main chapter title
 
 \label{Chapter5} % For referencing the chapter elsewhere, use \ref{Chapter1} 
 
@@ -8,7 +8,8 @@
 
 %----------------------------------------------------------------------------------------
 \section{Fourier Analysis}
-One of the most pressing concerns regarding switching power supplies is the spectral content of the output signal, both before and after filtering. This is of chief concern to power systems designers because the demands that excess spectral content can place on filtering increase size, weight, and cost of the inverter system. These additional frequencies represent energy that must be dissipated by the filter, and hence an inefficiency in our system. A comparative analysis of the dominant PWM techniques is necessary to understand the costs and benefits of each technique, but more importantly for the purpose of this paper, to understand how the hybrid algorithm used to modulate pulse-widths stacks up. In this section we lean heavily on the work of \cite{fourierAnalysis}.
+\label{fourier}
+One of the most pressing concerns regarding switching power supplies is the spectral content of the output signal, both before and after filtering. This is of chief concern to power systems designers because the demands that excess spectral content can place on filtering increase size, weight, and cost of the inverter system. These additional frequencies represent energy that must be dissipated by the filter, and hence an inefficiency in our system. A comparative analysis of the dominant PWM techniques is necessary to understand the costs and benefits of each technique, but more importantly for the purpose of this paper, to understand how the hybrid algorithm used to modulate pulse-widths stacks up. In this section we lean heavily on the work of Zhous in \cite{fourierAnalysis}. We contribute to this discussion by analyzing the performance of closed loop control, where Zhou strictly examines open loop PWM inverters.
 
 Recall that any signal can be decomposed into a sum of sines and cosines given by the expression:
 \begin{equation}
@@ -17,6 +18,12 @@ f_N(\omega t) = \frac{a_0}{2} + \sum_{n=1}^N \left(\overbrace{a_n}^{A_n \sin(\ph
 \end{equation}
 
 Where
+\begin{align*}
+& ~~~~~ a_0 = \frac{1}{T}\int_{0}^{T}f(t)dt \\
+a_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \cos(n\omega t)\ dt \\
+b_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \sin(n\omega t)\ dt \\
+c_n &= \frac{1}{T}\int_{t_0}^{t_0+T} f(t)\cdot e^{-in\omega t}\ dt
+\end{align*}
 
 \begin{equation}
 c_n \ \stackrel{\mathrm{def}}{=} \ \begin{cases}
@@ -26,13 +33,7 @@ c_{|n|}^*  & \text{for } n < 0.
 \end{cases}
 \end{equation}
 
-The Fourier coefficients of a signal can be found using:
-\begin{align*}
-& ~~~~~ a_0 = \frac{1}{T}\int_{0}^{T}f(t)dt \\
-a_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \cos(n\omega t)\ dt \\
-b_n &= \frac{2}{T}\int_{t_0}^{t_0+T} f(t)\cdot  \sin(n\omega t)\ dt \\
-c_n &= \frac{1}{T}\int_{t_0}^{t_0+T} f(t)\cdot e^{-in\omega t}\ dt
-\end{align*}
+
 The magnitude of every harmonic of the fundamental can be found by:
 
 \begin{align*}
@@ -48,7 +49,7 @@ For \textbf{odd symmetry}, that is, functions satisfying the equality $f(t)=-f(-
 \begin{equation}
 \begin{cases}
 a_n = 0 \\ 
-b_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t
+b_n = \frac{2}{\pi}\int_{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t
 \end{cases}
 \end{equation}
 
@@ -56,8 +57,8 @@ For \textbf{half-wave symmetry}:
 \begin{equation} 
 \begin{cases} 
 C_n = 0 &\mbox{for even n}  \\ 
-a_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\cos(n\omega t)d\omega t &\mbox{for odd n}  \\
-b_n = \frac{2}{\pi}\int{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t &\mbox{for odd n} 
+a_n = \frac{2}{\pi}\int_{0}^{\pi}f(\omega t)\cos(n\omega t)d\omega t &\mbox{for odd n}  \\
+b_n = \frac{2}{\pi}\int_{0}^{\pi}f(\omega t)\sin(n\omega t)d\omega t &\mbox{for odd n} 
 \end{cases}
 \end{equation}
 
@@ -68,7 +69,7 @@ And for \textbf{quarter-wave symmetry}:
 \begin{cases} 
 a_0 = 0 \\
 a_n = 0 &\text{for even n}  \\
-a_n = \frac{8}{T}\int{0}^{\frac{T}{4}}\cos{n\omega t} &\mbox{for odd n}  \\
+a_n = \frac{8}{T}\int_{0}^{\frac{T}{4}}\cos{n\omega t} &\mbox{for odd n}  \\
 b_n = 0 &\mbox{for all n} 
 \end{cases}
 \end{equation}
@@ -77,19 +78,33 @@ Quarter-wave symmetry holds for signals possessing half-wave symmetry, and also 
 \subsection{Total Harmonic Distortion and Electromagnetic Interferance}
 One of the most common metrics for assessing the quality of a signal is the total harmonic distortion (THD.) The THD is given by the expression:
 \begin{equation}
-THD=\frac{\sqrt{\sum_{2}^{\infty}}(V_n^2)_{rms}}{(V_1)_{rms}} = \frac{V_{rms}^2-{V_1}^2_{rms}}{{V_1}_{rms}} = \frac{\sqrt{K_0^2+K_1^2+\ldots+K_n^2}}{K_1}\cdot100\%
+THD=\frac{\sqrt{\sum_{2}^{\infty}(V_n^2)_{rms}}}{(V_1)_{rms}} = \frac{(V)_{rms}^2-(V_1)^2_{rms}}{(V_1)_{rms}} = \frac{\sqrt{K_0^2+K_1^2+\ldots+K_n^2}}{K_1}\cdot100\%
 \end{equation} 
 \todo{rewrite this graph completely!}
-Where ${V_n}_{rms}$ is the rms value of the n's harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component. To reduce undesired harmonics in the inverter output, a low THD value is desirable in PWM modulation. By using Fourier series, the determination of THD of a certain output is easy to obtain because magnitude of each harmonics (Cn ) can be calculated.
+Where ${V_n}_{rms}$ is the rms value of the $n^{th}$ harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component. To reduce undesired harmonics in the inverter output, a low THD value is desirable in PWM modulation. By using Fourier series, the determination of THD of a certain output is easy to obtain because magnitude of each harmonic $(C_n)$ can be calculated.
+
+From Maxwell's equations, we know that quickly varying electric fields cause the propogation of electromagantic transverse waves. This phenomena is commonly reffered to as electromagnetic interference (EMI). This radiated energy can couple into adjacent circuits and interfere with sensitive circuitry. Ostensibly, this noise can also couple into the inverter itself and introduce noise into analog measurements critical for operation of feedback loops. The Federal Communications Commision (FCC) has strict guidelines regarding the level of radiated energy allowable by any particular electronic device. FCC Part 15 B, concerning unintentional radiators, is the section we are most concerned with.  The FCC guidelines dictate that power inverters do not generate excessive harmonic content or EMI, that inverters should be immune to other sources of EMI, and that the level of EMI generated by any inverter does not interfere with the normal operation of surrounding devices. 
+
+Although these concerns are generally beyond the scope of this research, it is still an area of critical research to evaluate where the hybrid approach stands with respect to other PWM methods for its assessment as a product in the future. Because we have no plans for grid-tie capability at this time, we omit a coverage of common mode `series' filtering in this paper.
+
+For the following subsections, we will refer to the switching pairs (Q1, Q2) and (Q3, Q4) as shown in the H-bridge in Figure \ref{hBridge}.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{hBridge}
+\caption{The Simplified H-Bridge Circuit}
+\label{hBridge}
+\end{figure}
+
 
 \subsection{Bipolar PWM}
 \subsection{Unipolar PWM}
 \subsection{Modified Unipolar PMW}
 \subsection{Hybrid PWM}
 
-\section{PWM}
+\section{PWM Performance}
 
-\section{Hybrid}
+\section{Hybrid Performance}
 
 \section{Conclusion}
 The hybrid dynamical system approach for feedback control of a power inverter has shown great promise. This project is realizing this new technology as a engineering endeavor to create a viable hardware platform as a solar microinverter. This alternate control topology, compared existing techniques on the market, aims to define a new category of robust renewable inverter solutions.

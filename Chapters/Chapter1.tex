@@ -23,7 +23,8 @@ With the cost of photovoltaics rapidly decreasing, we have seen a rush toward th
 Today's renewable power conversion technologies are not robust to highly variable input sources like solar power. Before utilities break ground on large-scale solar farms, complex and costly stability analysis must be done to ensure that the possible energy contribution outweighs the destabilizing effect of megawatts of energy that can be thrown out with a rainstorm or eclipse. Some other challenges with solar include  the problem of shading or partial irradiance of solar arrays, and the non-linear nature of the photovoltaics themselves. This non-linear behavior necessitates the implementation of maximum power point tracking (MPPT) algorithms which comprehend this phenomena and harvest the most power from solar sources and inverters over their finite lifespans. This is critical for obtaining the maximum benefit from the non-trivial investment required to operate solar arrays today. 
 
 \subsection{Square and Modified Square Inverters}
-Square wave inverters are the simplest method for generating pseudo-sinusoidal outputs using an H-Bridge. Emulating the positive and negative half cycles of the sine with a simple bipolar scheme where the output is given be $+V_{dc}$ and $-V_{dc}$ respectively. After a filtering stage, the output can be shaped into something resembling a sine wave by only allowing the low frequency components of the square wave to pass. Note that the difference between a pure square wave and a modified square wave is the allowance of the zero state determined by the quantity $\alpha$ shown in Figure \ref{modifiedSquare}. Note that the Fourier series of the output is given by 
+\label{squareApproach}
+Square wave inverters are the simplest method for generating pseudo-sinusoidal outputs using an H-Bridge. They emulate the positive and negative half cycles of a sine with a simple bipolar scheme where the output is given be either $+V_{dc}$ or $-V_{dc}$ respectively. After a filtering stage the resulting output can appear quite sinusoidal because primarily low frequency components of the square wave have been allowed to pass; however, closer inspection would show that real-world filters struggle to meet the very low cutoff frequency requirements. Note that the difference between a pure square wave and a modified square wave is the allowance of the zero state determined by the quantity $\alpha$ shown in Figure \ref{modifiedSquare}. Note that the Fourier series of the output is given by 
 \begin{equation}
 v_0(t)=\sum\limits_{n,odd}V_n\sin{(n\omega_0t)}
 \end{equation}
@@ -36,50 +37,54 @@ This would add considerably to the complexity of any inverter system seeking to 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{modifiedSquare}
-\caption{Modified Square Wave}
+\caption{A Modified Square Wave Inverter Crudely Emulates the Positive and Negative Half-Cycles of a Sine Wave}
 \label{modifiedSquare}
 \end{figure}
 
 The `deal-breaker' with the square wave inverter is the fact the the spectral content of the output is particularly rich at all odd harmonics of the fundamental. This means that we are left with a bulk of the harmonic content at low frequencies which are particularly hard to filter with analog components. 
 
-\subsection{Linear Control and the PWM approach}
+\subsection{Pulse Width Modulation Inverters}
 \label{pwmApproach}
-Compared to square and modified square wave inverters, much of the filtering burden is alleviated due to the fact that spectral content in the vicinity of the fundamental is located near the frequency modulation index of the PWM signal. Pulse-width modulation (PWM), or bang-bang techniques, are a popular means for taking a fixed input voltage and varying the effective power seen at the output. This is done by rapidly switching the input off and on such that the the output is some fraction of the input including zero and one hundred percent. This fraction corresponds to the duty cycle. If we pair the PWM technique with the ability to drive current bidirectionally, say, through an H-Bridge circuit, we can use this technique to trace out a pseudo-sinusoidal output. 
+Compared to square and modified square wave inverters, much of the filtering burden is alleviated due to the fact that spectral content in the vicinity of the fundamental is located near the frequency modulation index of the PWM signal. Pulse-width modulation (PWM), or bang-bang techniques, are a popular means for taking a fixed input voltage and varying the effective power seen at the output.This is done by rapidly switching the input off and on such that the the output is some fraction of the input including zero and one hundred percent. This fraction corresponds to the duty cycle. If we pair the PWM technique with the ability to drive current bidirectionally, say, through an H-Bridge circuit, we can use this technique to trace out a pseudo-sinusoidal output. PWM inverters are found almost exclusively in one of two flavors: bipolar and unipolar. In bipolar inverters, the H-bridge is allowed to change state directly from $+V_{dc}$ to $-V_{dc}$, whereas in unipolar designs, the H-bridge is not allowed to switch directly from $+V_{dc}$ to $-V_{dc}$. Instead, unipolar inverters switch between from a positive output to zero, or from a negative output to zero.
 
 In contrast to the square wave inverters discussed above, with PWM it is possible to vary amplitude and frequency independently. The modulation index, which is given by $m_f=\frac{f_{tri}}{f_{sin}}$ where $f_{tri}$ is the frequency of the triangular carrier frequency, and $f_{sin}$ is the sinusoidal reference signal. 
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{bipolarSwitching}
-\caption{Bipolar Switching}
+\caption{Bipolar Switching Uses a Triangular Carrier and a Sinusoidal Reference to Change States from Rail to Rail}
 \label{bipolar}
 \end{figure}
 
-The switch in this case can take the form of a relay, but more commonly in power applications, takes the form of a field-effect transistor (MOSFET) or insulated gate bipolar transistor (IGBT). The effective voltage or current is varied by varying the duration of on-time of the switch. One can think of this as int terms of a common household faucet with only two states, either fully on or off. If we were able to modulate the amount of time that the water flowed from the faucet, clearly we would be able to choose the flow-rate of the water from the two extrema - on or off - to an arbitrary level of precision depending on how fast we were able to turn the faucet on or off. The scenario put forth in the 'kitchen sink' analogy is analogous to the situation we face in a modern power inverter. In this case, we are faced with the challenge of taking a typically fixed input voltage and switching it in such a way that we achieve a close approximation to a sinusoidal output voltage. Given the clear explanation of how PWM techniques can vary from fully on to fully off in the description above, it is easy to see why the PWM approach has become the standard for power inverters. Additionally, today's microcontrollers have extremely sophisticated peripheral modules built specifically for very fast and PWM signal generation with resolution down to the nanosecond level becoming quite common. 
+The switch in this case can take the form of a relay, but more commonly in power applications, takes the form of a field-effect transistor (MOSFET) or insulated gate bipolar transistor (IGBT). The effective voltage or current is varied by modulating the duration of on-time of the switch. One can think of this in terms of a common household faucet with only two states, either fully on or off. If we were able to modulate the amount of time that the water flowed from the faucet, clearly we would be able to choose the flow-rate of the water from the two extrema - on or off - to an arbitrary level of precision depending on how fast we were able to turn the faucet on or off. The scenario put forth in the 'kitchen sink' analogy is analogous to the situation we face in a modern power inverter. In this case, we are faced with the challenge of taking a typically fixed input voltage and switching it in such a way that we achieve a close approximation to a sinusoidal output voltage. Given the clear explanation of how PWM techniques can vary from fully on to fully off in the description above, it is easy to see why the PWM approach has become the standard for power inverters. Additionally, today's microcontrollers have extremely sophisticated peripheral modules built specifically for very fast and PWM signal generation, with resolution down to the nanosecond level becoming quite common. 
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{unipolarSwitching}
-\caption{Unipolar Switching}
+\caption{Unipolar switching uses a triangular carrier and a sinusoidal reference to change states from either rail to zero, but never from rail to rail.}
 \label{unipolar}
 \end{figure}
 
-The Fourier analysis for either bipolar or unipolar PWM output signals is not as straightforward as that of the square wave, so a full derivation is ommited from this discussion. However, the fact that the harmonic content occurs at multiples of the modulation frequency can be clearly observed in Figure \ref{pwmFourier}. 
+The Fourier analysis for either bipolar or unipolar PWM output signals is not as straightforward as that of the square wave, so a full derivation is saved for Section \ref{fourier}. However, the fact that the harmonic content occurs at multiples of the modulation frequency can be clearly observed in Figure \ref{pwmFourier}. 
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{pwmFourier}
-\caption{Fourier Spectrum Frequency Diagram for PWM Inverter Control}
+\caption{Fourier spectrum frequency diagram for both bipolar and unipolar pwm inverter control. Note that while the position of harmonics remains unchanged between either, the magnitude will likely differ.}
 \label{pwmFourier}
 \end{figure}
 
 Although the PWM method for signal modulation has the clear advantages of widespread adoption and ease of implementation, with the widespread adoption of renewable energy in the form of highly local and decentralized micro-grids, we are increasingly faced with the problem of introducing increasing amounts of high-order noise into the power grid. Further, the typical proportional, integral, derivative, or PID methods for control suffer from a ringing phenomena in the presence of input disturbances which are typical of renewable energy applications. In light of these issues with the PWM technique for power conversion, we seek to explore alternate strategies for switching that might alleviate the vulnerability to  input disturbances and the problem of an unintentionally rich spectrum at the output of PWM power converters. 
 
 \subsection{Hybrid Systems and Hybrid Control}
+\label{hybridApproach}
 The study of hybrid systems has emerged in recent years as a response to the increasing entanglement of physical systems and computer control. 
 Hybrid systems are those that exhibit both continuous and discrete-time dynamics. The system in question, namely the canonical power inverter topology, which is the focus of this research, is an excellent candidate for study under the lens of hybrid control due to the continuous evolution of a linear oscillator - our output filter - and the discrete time dynamics of the switch - in our case, a transistor receiving control signals from a micro. 
 
 We seek to understand how hybrid control might alleviate some of the challenges associated with PWM techniques, a few of which have been outlined above. While a detailed explanation of the hybrid control algorithm is saved for later on in this paper, in a nutshell it has been found that with relatively simple physical models of our system, and the availability of discrete time switching, that we can generate outputs that closely resemble the desired sinusoidal outputs with less switching noise, and with a robust response to highly variable input voltages. For these reasons, we focus this research on the physical realization of such a hybrid system. One of the goals of this paper is to describe the algorithm designed by Jun Chai and Dr. Ricardo Sanfelice in more detail, and outline some of the challenges associated with realizing this implementation on a real world system \cite{ricardo}.
+
+\subsection{The Hybrid Pulse Width Modulation Algorithm}
+
 
 \section{Approach}
 It is widely accepted that distributed generators (DG) and the use of 'smart inverters' have a far less detrimental effect on the stability of the grid than centralized solar production, and can even have a stabilizing effect on the grid. So-called 'microinverter' deployment strategies for solar systems offer improved reliability and potentially reduced installation costs. Widespread integration of microinverters with individual solar panels to form AC power generation units removes single-point failure risks found in common centralized PV inverter arrangements. Microinverters for single panels can have longer mean times between failures since they are often designed for the 200W power range and operate with lower temperatures due to reduced heat waste. The economies of scale for manufacturing many consumer microinverters reduces hardware costs found in building few larger high power PV inverters \cite{microchip}. Another benefit of the microinverter approach is that the feedback mechanisms at work optimize the power generation of every panel in the system by each unit's particular conditions - this makes them robust in situations like partial shading.
@@ -87,11 +92,10 @@ It is widely accepted that distributed generators (DG) and the use of 'smart inv
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{solarBlockDiagram}
-\caption{Inverter System Overview}
+\caption{System level overview of the Hybrid Inverter Team's microinverter}
 \label{solarBlock}
 \end{figure}
-
-{Ben wrote the rest of this}
+\todo[inline]{Ben wrote this paragraph}
 Switching power inverters are an enabling technology found in energy conversion systems. Photovoltaic (PV) panels harvest energy from the sun to generate the alternating current (AC) electricity used in the grid. PV arrays output direct current (DC) electricity, thus an inverter is required to generate the versatile AC power used in standard loads as shown in Figure~\ref{solarBlock}. Energy sourced from renewable resources is variable in nature and necessitates feedback controlled electronics to maintain stable power production. This project is focused on delivering a microinverter system as a robust solution for solar power applications. 
 
 A new hybrid systems based feedback control scheme for generating the switching signals of an H-bridge is being utilized in this inverter as an alternative to PWM signals derived from the comparison of reference sinusoids and triangular carrier waves. Note that we believe it to be a bit of a misnomer to say that this technique is an alternative to PWM; rather, the hybrid controller offers an alternate means for \emph{generating} the pulse-width modulated signal seen at the H-bridge. 
