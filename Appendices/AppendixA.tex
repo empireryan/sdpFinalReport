@@ -1,99 +1,175 @@
 % Appendix A
+% Appendix A
 
-\chapter{Appendix Title Here} % Main appendix title
+\chapter{The Matlab Implementation} % Main appendix title
 
 \label{AppendixA} % For referencing this appendix elsewhere, use \ref{AppendixA}
 
-\lhead{Appendix A. \emph{Appendix Title Here}} % This is for the header on each page - perhaps a shortened title
-
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{logic_power.PNG}
-\caption{Logic Power Supply Circuit}
-\label{logic power fig}
-\end{figure}
+\lhead{Appendix A. \emph{Circuit Figures}} % This is for the header on each page - perhaps a shortened title
 
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_boost.png}
-\caption{Boost Circuit}
-\label{Figure E}
-\end{figure}
+\lstset{
+  style              = Matlab-editor,
+  basicstyle         = \mlttfamily,
+  escapechar         = ",
+  mlshowsectionrules = true,
+}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_Vpanel.png}
-\caption{PV Voltage Sense Circuit}
-\label{Figure F}
-\end{figure}
+\section{Flow Set}
+\begin{lstlisting}[label={lst:flowSetMatlab}]
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_Ipanel.png}
-\caption{PV Current Sense Circuit}
-\label{Figure G}
-\end{figure}
+%===============================
+%Hs Controller - Hfw in the loop
+%===============================
+if(p == 1)     % if were between the tracking bands, flow
+    if((Vz0 >= cin) && (Vz0 <= cout))
+        inC = 1;  
+    else	   % not in the tracking bands, report not-flowing
+        inC = 0;
+    end
+%===============================
+%Hs Controller - Hg in the loop
+%===============================
+else 
+    if(Vz0 >= cout)        %if were beyond Co
+        inC = 1;
+    elseif(Vz0 <= cin);       %if were within Ci
+        inC = 1;
+    else 
+        inC = 0;
+    end
+end
+    
+%======================
+%For the Hfw Controller
+%======================
+if(p == 1)    
+    if((Vz0 >= cin) && (Vz0 <= cout))
+        inC = 1;
+    else
+        inC = 0;
+    end
+else
+    inC = 0;
+end
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_driver.png}
-\caption{ Gate Driver Circuit}
-\label{Figure H}
-\end{figure}
+%======================
+%For the Hg Controller
+%======================
+if(p == 2)
+    if((Vz0 <= cin) || (Vz0 >= cout))
+        inC = 1;
+    else
+        inC = 0;
+    end
+else
+    inC = 0;
+end
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_Isw.png}
-\caption{Switch Current Sense Circuit}
-\label{Figure I}
-\end{figure}
+\end{lstlisting}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{sch_Vboost.png}
-\caption{Boosted Voltage Sense Circuit}
-\label{Figure J}
-\end{figure}
+\section{Jump Set}
+\begin{lstlisting}[label={lst:jumpSetMatlab}]
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{Boost_Schematic.PNG}
-\caption{Boost Converter Schematic}
-\label{Figure 6}
-\end{figure}
+%====================================
+%Determine if Solution is in M1 or M2
+%====================================
+mEpsilon = .5;	%dependant on the current and voltage targets
+if ((abs(Vz0 - cout) < err) && ((il >= 0) && (il <= mEpsilon)) && (vc <= 0))
+    M1 = 1;
+else
+    M1 = 0;
+end
+if ((abs(Vz0 - cout) < err) && ((il >= -mEpsilon) && (il <= 0)) && (vc >= 0))
+    M2 = 1;
+else
+    M2 = 0;
+end
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5 in]{Boost_PCB_TOP.PNG}
-\caption{Boost Board PCB Top}
-\label{Figure 7}
-\end{figure}
+%======================
+%For the Hs Controller
+%======================
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5 in]{Boost_PCB_BOTTOM.PNG}
-\caption{Boost Board PCB Bottom}
-\label{Figure 8}
-\end{figure}
+%p == 1 -> Hfw in the loop
+%p == 2 -> Hg in the loop
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{boost_PCB_routed.jpg}
-\caption{Board Board PCB}
-\label{Figure D}
-\end{figure}
+if(p == 2)
+    if((Vz0 >= cin) && (Vz0 <= cout))
+        inD = 1;
+    end
+else
+    inD = 0;    
+end
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{PCB_top.PNG}
-\caption{PCB Top Layer}
-\label{PCB top}
-\end{figure}
+%======================
+%For the Hfw Controller
+%======================
+if(p == 1)
+    if(q ~= 0)
+       if( (abs(Vz0-cin) <= err) && (il*q <= 0))
+           inD = 1;
+       elseif( (abs(Vz0-cout) <= err) && (il*q >= 0))
+           inD = 1;
+       end
+    elseif (q == 0)
+        if( (abs(Vz0-cin) <= err) && (q == 0))
+            inD = 1;
+        end   
+    end
+end
 
-\begin{figure}[h]
-\centering
-\includegraphics[width = 3.5in]{PCB_bottom.PNG}
-\caption{PCB bottom}
-\label{PCB bottom}
-\end{figure}
+%======================
+%For the Hg Controller
+%======================
+if(p == 2)
+    if((Vz0 >= cin) && (Vz0 <= cout))
+        inD = 1;
+    else
+        inD = 0;
+    end
+end
+\end{lstlisting}
+
+\section{Jump Map}
+\begin{lstlisting}[label={lst:jumpMapMatlab}]
+%======================
+%For the Hs Controller
+%======================
+if(p == 2)
+    if((Vz0 >= cin) && (Vz0 <= cout))
+        pplus = 1;
+    end
+else
+    pplus = p;    
+end
+
+%======================
+%For the Hfw Controller
+%======================
+if(p == 1)    
+    if(q ~= -1)
+        if( ((abs(Vz0-cout) <= err) && (il >= 0) && (~M1)) || (((abs(Vz0-cin) <= err)) && (il <= 0)) )
+        qplus = -1;
+        end
+    elseif ( ((M1) && (abs(il - mEpsilon) >= err) && (q == 1)) || ((M2) && (abs(il + mEpsilon) >= err) && (q == -1)) )
+            qplus = 0;
+    elseif(q ~= 1)
+        if( ((abs(Vz0 - cout) <= err) && (il <= 0) && (~M2)) || (((abs(Vz0 - cin) <= err)) && (il >= 0)) )
+            qplus = 1;
+        end
+    else
+        qplus = q;        
+    end
+end
+
+%======================
+%For the Hg Controller
+%======================
+if(p == 2)
+    if((Vz0 >= cin) && (Vz0 < cout))
+        pplus = 1;
+    else
+        pplus = p;
+    end
+end
+\end{lstlisting}

@@ -184,7 +184,9 @@ A first order estimate of the boost's efficiency, with the above three loss cons
 \begin{equation}
 \eta_{est} = efficiency_{estimate} = \frac{P_{in} - {(P_{sw}+P_L+P_D)}}{P_{in}} = 97\%
 \end{equation}
-\todo[inline]{do not write out efficiency_estimate in math mode. Say eta with the appropriate subscript, then explain that variable in text}
+
+\todo[inline]{do not write out efficiency estimate in math mode. Say eta with the appropriate subscript, then explain that variable in text}
+
 This is an optimistic conversion efficiency and does not fully encapsulate an array of other possible factors such as component tolerances and capacitive equivalent series resistances. A deviation of 10\% is a fair engineering estimate on how much this efficiency could drift.
 
 The boost converter circuit prototype allows efficiency testing under the constraints of a laboratory environment. Efficiency is calculated with the relationship shown in the following equation. The operating parameters of the test are: $V_{in} = 12V$,~ $R_{load} = 477.66\Omega$ , $F_{switching} = 50 kHz$. 
@@ -319,7 +321,7 @@ The Hybrid Inverter Team's development board aims to be a higher power replaceme
 
 Our PCB layouts utilized a four layer design with power and ground planes on the two middle layers. Multiple layers allowed for components to be placed closer together, and achieve a smaller overall form factor while allowing for higher current carrying capabilities. Additionally, we were able to use polygon pours on the central power layers to boost current carrying capacity and aid in the dissipation of heat. Ground plane isolation was used to separate areas with switching power signal and digital logic.
 
-Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey\todo[inline]{just do me a favor and read this}. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}.\todo[inline]{really need to work on the wording o this paragraph} 
+Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey\todo[inline]{just do me a favor and read this}. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}.\todo[inline]{really need to work on the wording of this paragraph} 
 
 \begin{figure}
 \centering
@@ -340,7 +342,7 @@ The inverter sits in an enclosure mounted to the back of a solar panel to follow
 
 \subsection{Revision One}
 Revision one 
-First, we opted to omit the control card socket for a full microcontroller layout with a JTAG interface for debugging. Second, we omitted s
+First, we opted to omit the control card socket for a full microcontroller layout with a JTAG interface for debugging. Second, we omitted 
 
 \subsection{Revision Two}
 
