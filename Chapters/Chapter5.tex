@@ -98,8 +98,28 @@ For the following subsections, we will refer to the switching pairs (Q1, Q2) and
 
 
 \subsection{Bipolar PWM}
+The operation of a bipolar switching scheme generally operates as follows
+\begin{equation}
+\begin{cases}
+\label{bipolarStates}
+V_{out} = V_{dc} &\mbox{if V_{ref} > V_{c}}
+V_{out} = -V_{dc} &\mbox{if V_{ref} < V_{c}}
+\end{cases}
+\end{equation}
+
+Where $V_{ref}$ is the reference signal, and $V_c$ is the carrier signal. In Figure \ref{bipolarSwitchingOperation} we can see that $V_{out} = V_{AO}-V_{BO}$ resulting in an output that exists only in one of the two states described in equation \ref{bipolarStates}. If we select an odd modulation index, the output waveform exhibits odd-symetry and we can effectively eliminate all even harmonics at the output.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{hBridge}
+\caption{The operation of a bipolar switching scheme for an inverter \cite{fourierAnalysis}}
+\label{bipolarSwitchingOperation}
+\end{figure}
+
 \subsection{Unipolar PWM}
-\subsection{Modified Unipolar PMW}
+
+%\subsection{Modified Unipolar PMW}
+
 \subsection{Hybrid PWM}
 
 \section{PWM Performance}
