@@ -319,9 +319,10 @@ Solar cells each typically produce under 1V, so multiple cells are be connected 
 \section{The Hybrid Inverter Team Development Board}
 The Hybrid Inverter Team's development board aims to be a higher power replacement for TI's Solar Explorer development board with several key changes. Several of the auxiliary modules included with the Solar Explorer that were unnecessary for our design were omitted. The omitted modules included the second microcontroller for solar panel emulation, as well as the SEPIC converter used for battery charging. With the already lofty goal of building a full switch-mode boost and inverter, we felt it would be a great deal of added complexity to build, code, and troubleshoot the SEPIC battery charger for our senior design project. The panel emulator was unnecessary since we would either be running the board from an ATX power supply, or a real solar panel.
 
-Our PCB layouts utilized a four layer design with power and ground planes on the two middle layers. Multiple layers allowed for components to be placed closer together, and achieve a smaller overall form factor while allowing for higher current carrying capabilities. Additionally, we were able to use polygon pours on the central power layers to boost current carrying capacity and aid in the dissipation of heat. Ground plane isolation was used to separate areas with switching power signal and digital logic.
+Our PCB layout utilizes a four layer design with power and ground planes on the two middle layers. Multiple layers allow for components to be placed closer together to achieve a smaller overall form factor. Additionally, there are polygon pours on the central power layers to increase current carrying capacity and aid in the dissipation of heat. Ground plane isolation is used to separate areas with switching power signals and digital logic.
 
-Input and output connection points were placed around the perimeter of the board for easy interfacing with cables. Eagle PCB was utilized for this design and the board house Advanced Circuits was used for board fabrication. Parts were sourced from the Digikey\todo[inline]{just do me a favor and read this}. The top layer of the PCB is shown in Figure ~\ref{PCB top} and the bottom layer in Figure ~\ref{PCB bottom}. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}.\todo[inline]{really need to work on the wording of this paragraph} 
+Development of the PCB layout was done with EAGLE to create the top layer as shown in Figure ~\ref{PCB top} and the bottom layer shown in Figure ~\ref{PCB bottom}. The board house Advanced Circuits was used for fabrication while components were purchased from Digi-Key. The completed circuit board is displayed in Figure ~\ref{hybrid_PCB}. 
+ 
 
 \begin{figure}
 \centering
@@ -331,7 +332,7 @@ Input and output connection points were placed around the perimeter of the board
 \end{figure}
 
 
-The inverter sits in an enclosure mounted to the back of a solar panel to follow the microinverter topology. The output filter and transformer are constructed using turret board, and is also mounted on the panel mounting system. For testing in outdoor sunlight environments, a wooden stand for the solar panel and inverter system as shown in Figure~\ref{solar stand}.
+Following the microinverter topology, the inverter sits in an enclosure mounted to the back of a solar panel. The output filter and transformer are constructed using turret board, and are also attached on the panel mounting system. For testing in outdoor sunlight environments, a wooden stand for the solar panel and inverter system is used as shown in Figure~\ref{solar stand}.
 
 \begin{figure}
 \centering
