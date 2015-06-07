@@ -37,7 +37,7 @@ c_{|n|}^*  & \text{for } n < 0.
 The magnitude of every harmonic of the fundamental can be found by:
 
 \begin{align*}
-K_0 &= \frac{\frac{a_0}{2}}{2} \\
+K_0 &= \frac{a_0}{2} \\
 K_n &= \sqrt{a_n^2+b_n^2}
 \end{align*}
 
@@ -68,7 +68,7 @@ And for \textbf{quarter-wave symmetry}:
 \begin{equation} 
 \begin{cases} 
 a_0 = 0 \\
-a_n = 0 &\text{for even n}  \\
+a_n = 0 &\mbox{for even n}  \\
 a_n = \frac{8}{T}\int_{0}^{\frac{T}{4}}\cos{n\omega t} &\mbox{for odd n}  \\
 b_n = 0 &\mbox{for all n} 
 \end{cases}
@@ -102,43 +102,72 @@ The operation of a bipolar switching scheme generally operates as follows:
 \begin{equation}
 \begin{cases}
 \label{bipolarStates}
-V_{out} = V_{dc} &\mbox{if V_{ref} > V_{c}}
-V_{out} = -V_{dc} &\mbox{if V_{ref} < V_{c}}
+V_{out} = V_{dc} &\mbox{if $V_{ref} > V_{c}$} \\
+V_{out} = -V_{dc} &\mbox{if $V_{ref} < V_{c}$}
 \end{cases}
 \end{equation}
+
 In this inversion scheme, opposing switching pairs are modulated simulataneously. 
 Where $V_{ref}$ is the reference signal, and $V_c$ is the carrier signal. In Figure \ref{bipolarSwitchingOperation} we can see that $V_{out} = V_{AO}-V_{BO}$ resulting in an output that exists only in one of the two states described in equation \ref{bipolarStates}. If we select an odd modulation index, the output waveform exhibits odd-symetry and we can effectively eliminate all even harmonics at the output.
 
 \begin{figure}
 \centering
 \includegraphics[width = 3.5in]{bipolarPwmShot}
-\caption{The operation of a bipolar switching scheme for an inverter. \cite{fourierAnalysis}}
+\caption{The operation of a bipolar switching scheme for an inverter.\cite{fourierAnalysis}} 
 \label{bipolarSwitchingOperation}
 \end{figure}
 
 \subsection{Unipolar PWM}
-The operation of the unipolar PWM works under the following rules, given a triangular carrier signal and a sinusoidal reference. Note that in Figure \ref{unipolarStates}, $V_{control}_{}$
+The operation of the unipolar PWM works under the following rules, given a triangular carrier signal and a sinusoidal reference. Note that in Figure \ref{unipolarStates}, ${V_{control}}_{1}$
+
 \begin{equation}
-\begin{cases}
 \label{unipolarStates}
-V_{out} = V_{dc} &\mbox{if V_{ref} > V_{c}}
-V_{out} = -V_{dc} &\mbox{if V_{ref} < V_{c}}
-V_{out} = 0 &\mbox{if V_{ref} < V_{c}}
+\begin{cases}
+V_{out} = V_{dc} &\mbox{if $V_{ref} > V_{c}$}  \\
+V_{out} = -V_{dc} &\mbox{if $V_{ref} < V_{c}$}  \\
+V_{out} = 0 &\mbox{if $V_{ref} < V_{c}$}  \\
 \end{cases}
 \end{equation}
+
+
 
 \begin{figure}
 \centering
 \includegraphics[width = 3.5in]{unipolarPwmShot}
-\caption{The operation of a unipolar switching scheme for an inverter. Note that a single control signal is used in our software implementation since each control signal is the other's dual. \cite{fourierAnalysis})
-\label{hBridge}
+\caption{The operation of a unipolar switching scheme for an inverter. Note that a single control signal is used in our software implementation since each control signal is the other's dual. \cite{fourierAnalysis}}
+\label{unipolarPwmShot}
 \end{figure}
 
 \subsection{Hybrid PWM}
 
 \section{PWM Performance}
+In this section we undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar and unipolar PWM, and the hybrid PWM. We have taken our results mainly from two sources aside from the purely mathematical results obtained for bipolar and unipolar PWM given above. First, we compare state the results of fourier analysis in Matlab/Simulink using the fast fourier transform (FFT). Next, we discuss how the unipolar and hybrid PWM techniques fair in our real-world tests on the hybrid inverter team development board. These reults are obtained using the FFT functionality of a Techtroniks oscilloscope. \todo[inline]{get full scope name} 
+\subsection{Bipolar PWM}
+In Simulink we implemented a simple bipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{bipolarFFTMatlab}. The THD of this signal is found to be nearly $147\%$, and we note that the harmonics at the the frequency of modulation are greater than the funamentals for this scheme.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{bipolarFFTMatlab}
+\caption{The spectral content of a bipolar inverter is given by FFT, with harmonics shown as multiples of the fundamental at 60Hz}
+\label{bipolarFFTMatlab}
+\end{figure}
+\todo[inline]{include fourier analysis equations from 13}
+
+Due to time constraints, we were not able to perform analyses on a bipolar inverter in hardware; the focus of this work is on the industry standard unipolar scheme discussed in the next subsection. 
+\subsection{Unipolar PWM}
+
+Again, using Simulink we implemented a unipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{unipolarFFTMatlab}. The THD of this signal is found to be around $77\%$, or nearly half that of the bipolar scheme. Here, the magnitdude of the fundamental is greater than any of the harmonics. These results confirm those of \cite{fourierAnalysis}, though we found the THD of the bipolar scheme in our simulation to be much higher. Both measurements were taken before any kind of filtering stage. 
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{unipolarFFTMatlab}
+\caption{The spectral content of a unipolar inverter is given by FFT, with harmonics shown as multiples of the fundamental at 60Hz}
+\label{unipolarFFTMatlab}
+\end{figure}
+
+\todo[inline]{include fourier analysis from 13}
+
 
 \section{Hybrid Performance}
 
 \section{Conclusion}
-The hybrid dynamical system approach for feedback control of a power inverter has shown great promise. This project is realizing this new technology as a engineering endeavor to create a viable hardware platform as a solar microinverter. This alternate control topology, compared existing techniques on the market, aims to define a new category of robust renewable inverter solutions.

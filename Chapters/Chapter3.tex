@@ -22,7 +22,6 @@ As with any microcontroller system, it is necessary to first configure the vario
 
 The two primary tasks of the software system are undoubtedly the control of the DC boost circuit, and the control of the inverter hardware. These tasks are pictured in Fig.\ref{fast} and Fig.\cite{slow} respectively. These tasks are performed using interrupt service routines (ISR)that are cued by the rising edge of a PWM signal. These signals offer a convenient way to trigger the interrupts, as well as the start of conversion (SOC) for the ADC. The SOC begins a sequential sampling of all the control signals on the board, making the most recent data available just in time for the execution of the ISR. Note that the PWM signals used for triggering interrupts are seperate from the PWM signals used for switching the transistors. With the execution of rapid-fire service routines, we may encounter the problematic condition where both ISRs attempt to fire at the same time. Instead of having the service routines fight for processor time with mechanisms like priorities, we opt to implement a phase synchronization scheme wherein the two PWM modules firing off interrupts are seperated by a pre-determined phase margin. This phase margin allows us to specify the time between rising edges of both PWM signals in relation to each other, the result being two dependent PWM channels that offer us an assurance that there will be no processor contention as long as we service either interrupt in a reasonable amount of clock cycles.
 
-
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width = 4 in]{boostISR}
@@ -30,8 +29,6 @@ The two primary tasks of the software system are undoubtedly the control of the 
 \label{fast}
 \end{center}
 \end{figure}
-
-
 
 \subsection{State Framework}
 Although simple state frameworks are possible using functions as a sort of 'pseudo state,' these implementations tend to become exceedingly complex and ahrd to follow for non-trivial state machines. Further, cobbling together new state machines or adding new states can be a daunting task with the resulting spaghetti code. 
@@ -121,10 +118,25 @@ While this brief example departs from our actual implementation on the micro, it
 \subsection{The Digital Power Library}
 One of the key features that made the Piccolo family of micro's an attractive option was the extensive power library that the the micro offered. In particular, the chip has the capability to run digital compensators of the 2P2Z form described in the section on the boost controller, and 3P3Z compensators as well. In addition, we have the ability to implement PID controllers with on-the-fly coefficient tuning via JTAG.
 
-\subsection{Hybrid Algorithm Implementation Details}
+\section{The PWM Algorithm Implementation Details}
+In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implemntation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width = 4 in]{traditionalISR}
+\caption{Software diagram of the `slow' ~20kHZ traditional PWM inverter ISR}
+\label{fast}
+\end{center}
+\end{figure}
+
+Since the DC bus is not regulated by the boost stage feeding the inverter, the inverter itself uses nested control loops; the inner loop is for voltage control, and the outer loop employs current control. The voltage loop is used to provide a reference to the current loop; as the inverter is loaded and current demand increases, it is natural for the voltage to sag. The current reference at any instant is used with a software PID controller to provide the duty cycle to the inverter. To prevent current distortion, the voltage loop is only updated during zero-crossing events.
+
+A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave is generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 100kHz. Using Texas Instruments digital power library blocks, we then generate the sinusoidal reference. The two signals are compare with an onboard analog comparator which is tied to the trip of the PWM signals connected to the H-Bridge. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. 
+
+\section{Hybrid Algorithm Implementation Details}
 In the initial stages of research and development, the hybrid inverter team first sought to recreate the simulations described in \cite{ricardo}. These simulations were best accomplished using the Hybrid Equations Toolbox in Matlab. Although the particulars of this implementation would be quite different than the final implementation in hardware, it was an excellent exercise in understanding the particulars of the algorithm, and also to give us a reference while implementing the hybrid controller on the C2000 micro controller in C. 
 
-\subsubsection{The Matlab Implementation}
+\subsection{The Matlab Implementation}
 The first step in building the algorithm with Matlab was to translate the flow and jump sets into Matlab code. Determining which set the solution of the RLC filter is a member is critical in determining when to switch, and when to allow the differential equation solver to flow. 
 
 These sets roughly translate as follows. Note that it can be helpful to refer to Figure \ref{jump} when deciphering the subsequent expressions. The flow set was translated as shown in \ref{lst:flowSetMatlab}.
@@ -137,12 +149,46 @@ In the code, 'qplus' refers to the state that we're going to jump to, and 'pplus
 
 This is the bulk of the code for the Matlab simulations, though we have omitted the description of the behavior of the system as the solution flows, as this is covered in detail in \cite{ricardo}.
 
-\subsubsection{The C Implementation on the C2000}
+\subsection{The C Implementation on the C2000}
+Without being a rehash of Dr. Sanfelice and Jun Chai's paper on the hybrid control of the power inverter\cite{ricardo}, we aim to briefly clarify the mechanisms behind how the hybrid inverter works, and discuss the process we undertook in implementing the algorithm on our custom hardware validation platform. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width = 4 in]{hybridISR}
+\caption{Software diagram of the `slow' ~20kHZ hybrid PWM inverter ISR}
+\label{fast}
+\end{center}
+\end{figure}
+
+The derivation of the hybrid control algorithm is roughly as follows: given that the response of a series RLC filter can be thought of as a linear oscillator with a damping term, and given that we have a set of desired output parameters - namely the amplitude of the output voltage, the amplitude of the output current, and the angular frequency $\omega$, then by solving the resultant linear differential equation, we can derive a reference solution for the given system to a perfect sinusoidal driving signal. In reality we will not have a sinusoidal driver, but rather some permutation of a square wave capable of switching between $+V_{dc}$ and $-V_{dc}$, where $V_{dc}$ is the DC bus voltage at the input to the H-Bridge controlled by the state variable $q$. We consider $q=1$ to correspond to $+V_{dc}$, $q=-1$ to correspond to $-V_{dc}$, and $q=0$ to correspond to $0$. This process is illustrated clearly in Figure \ref{jumpMap}.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width = 3.5 in]{jumpMap}
+\caption{Jump Map of the Hybrid Algorithm \cite{ricardo}}
+\label{jump}
+\end{center}
+\end{figure}
+
+
+We can think of the resultant solution to the sinusoidal driver as the ideal to which our system should strive, and therefore any deviation from this ideal can be considered as an error that needs to be corrected by the controller. These errors are detected by building a tracking band around the reference solution; this is done by choosing a neighborhood around the reference solution. Collectively, this region is known as the tracking band. Now, if we consider the instantaneous state of the system to be a vector made up of the capacitor voltage and the current through the inductor, then we can measure the location of the vector in relation to the tracking band on the VI plane. Since the inductor and capacitor are at all times 90 degrees out of phase without any load or perturbation, the ideal solution takes the shape of an ellipse on the VI plane. By taking the state vector's position relative to the tracking band, and knowing the trajectory at a given region on the VI plane, it is straightforward to develop a small set of rules governing the switching of the inverter, i.e. the jump between the three states of the H-bridge circuit, namely $q=1$, $q=-1$, and $q=0$. With this brief foundation, we are able to steer the state of the system around the VI plane, with the resultant output being a pseudo-sinusoid with the desired voltage and current amplitude and frequency. 
+
 With the logic for the controller worked out in Matlab, the work of porting the code to embedded C on the Texas Instruments DSP was a matter of fitting this logic within the bounds of the hardware modules onboard.
 In the sections above, namely Section \ref{softOver}, we discussed that the general flow of the software on the C2000 DSP is to first initialize and configure the hardware modules onboard, then to service interrupts for the boost converter and the inverter. Of chief concern in this section is the inverter ISR where we call upon a state machine that determines membership in the jump set, then informs the hardware of the appropriate action to take. The state machine is implemented using the custom state framework described above.
 
-Because the proper operation of the controller depends it's interface with hardware, we will cover briefly the initialization of the PWM driver that we use to interface to the state machine running the hybrid algorithm. Because the hardware modules have a good deal of 'native' support for running inverter systems, adjacent PWM modules are designed to operate adjacent half-bridge modules that make up a full H-Bridge in an inverter. This means we can configure parameters like deadband, counting mode, period and phase synchronization quite simply for adjacent PWM modules. Note that in our design we utilize PWM modules one and two. The driver function itself, because we are operating the PWM in hybrid mode as simple $0$ or $100\%$ duty cycle, utilizes the fact that we can set the trip of the ePWM modules to a period greater or less than the timer can ever reach. In this way, we can operate the PWM modules essentially as GPIO pins that are either logic high or logic low without reconfiguring the hardware to treat these pins as GPIO. This functinality could potentially allow for `hot-swapping' between hybrid and traditional PWM operation.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width = 6 in]{hybridLogic}
+\caption{Flow chart of the logic invloved with executing the `Hybrid Jump Logic' within the hybrid PWM inverter ISR}
+\label{fast}
+\end{center}
+\end{figure}
 
+The proper operation of the controller depends on it's interface with hardware; therefore, we will briefly cover the initialization of the PWM driver that we use to control the H-bridge. Adjacent PWM modules, namely PWM1 and PWM 2, are used to operate the half-bridge modules that make up the complete H-Bridge of our inverter. Each PWM module drives two PWM signals that are configured to be duals of one another - this prevent shoot-through in the H-bridge. These two signals are designated by PMWxA or PWMxB, where x is the number of the module, and A and B represent the two PWM signals of each module. In our implementation, PWMxA of each modules drives the low-side FET of each leg, while PWMxB drives the high side FET. 
+
+In our hardware setup, we configure parameters like deadband, counting mode, period and phase synchronization for the adjacent PWM modules driving our H-bridge. The driver function itself - because we are operating the PWM in hybrid mode as simple $0$ or $100\%$ duty cycle - utilizes the fact that we can set the trip of the ePWM modules to a period greater or less than the timer can ever reach. In this way, we can operate the PWM modules essentially as GPIO pins that are either logic high or logic low without reconfiguring the hardware to treat these pins as GPIO. This functionality could potentially allow for `hot-swapping' between hybrid and traditional PWM operation, although we do not make use of such a functionality at this time. Secondarily, the use of PWM modules to produce $0$ and $100\%$ duty cycles allows for the use of control law accelerator (CLA) functionality in future revisions. 
+
+The PWM driver function was written as follows:
 \lstset{frame=tb,
   language=C,
   aboveskip=3mm,
@@ -163,8 +209,8 @@ Because the proper operation of the controller depends it's interface with hardw
 #define PWMDRV_Hybrid(v)
 	if ( v == VDC)
 	{
-		(*ePWM[n]).CMPA.half.CMPA	= 0 ;
-		(*ePWM[n+1]).CMPA.half.CMPA	= TBPRD + 1;
+		(*ePWM[n]).CMPA.half.CMPA	= TBPRD + 1;
+		(*ePWM[n+1]).CMPA.half.CMPA	= 0;
 	}
 	else if (v == ZERO_VDC){
 		(*ePWM[n]).CMPA.half.CMPA	= 0 ;
@@ -172,15 +218,19 @@ Because the proper operation of the controller depends it's interface with hardw
 	}
 	else if (v == NEG_VDC)
 	{
-		(*ePWM[n]).CMPA.half.CMPA	=  TBPRD + 1;
-		(*ePWM[n+1]).CMPA.half.CMPA	= 0 ;
+		(*ePWM[n]).CMPA.half.CMPA	=  0;
+		(*ePWM[n+1]).CMPA.half.CMPA	= TBPRD + 1;
 	}
 #endif
 \end{lstlisting}
 
+Putting a zero in the CMPA register of leg 2 (n+1) means that the high side fet on leg 2 is off, and the low side fet is on.
+Putting TBPRD+1 in the CMPA register of  leg 1 means that the low side fet is off, while the high side fet is on. 
+The result is a current path from vdc through the load, and back down to ground (effectively $+V_{dc}$ at the load). Following an inverse logic, we can achieve $-V_{dc}$ at the load, as well as connecting the load to ground - effectively placing zero volts at the load - by driving both low side FETs.
+
 After having properly configured the PWM modules for operation of an H-bridge, we can use the driver function to update the state of the H-Bridge with deadband for shoot-through protection. This driver function is called after the transition logic is executed, and the transition logic is executed only after the current state variable is constructed. Let's examine the update of the state variable on each iteration of the inverter ISR. 
 
-@todo: update this as we calculate the phase and clarify logic!
+\todo[inline]{update this as we calculate the phase and clarify logic!}
 \begin{lstlisting}
 	Vac_in = (long)((long)Vac_FB<<9)-Offset_Volt;	// shift to convert to Q21
 	inv_ref_cur_inst = _IQ24mpy(inv_Iset, (((long) (InvSine)) << 9)) ;
@@ -316,58 +366,6 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
 }
 \end{lstlisting}
 
-
 The result of the C code above is identical to that in the Matlab iteration, save for the fact that it is superfluous to know whether or not we are in the flow set because they system is not solving any differential equations, but rather it is causing real hardware to execute in real-time.  Therefore, it is sufficient to determine whether or not we are in the jump set. Note that in the above code segment, there is no interface to hardware, only a change in the signal of the event 'e.' After the signal member of the event structure is set, this event gets dispatched to the current state (function), which performs the state transition. The current state of the machine is echoed in hardware via the hybrid PWM driver function. Thus, we have executed the full hybrid controller in C on our DSP. 
- 
-\section{The PWM Algorithm}
-In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implemntation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
 
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width = 4 in]{traditionalISR}
-\caption{Software diagram of the `slow' ~20kHZ traditional PWM inverter ISR}
-\label{fast}
-\end{center}
-\end{figure}
-
-Since the DC bus is not regulated by the boost stage feeding the inverter, the inverter itself uses nested control loops; the inner loop is for voltage control, and the outer loop employs current control. The voltage loop is used to provide a reference to the current loop; as the inverter is loaded and current demand increases, it is natural for the voltage to sag. The current reference at any instant is used with a software PID controller to provide the duty cycle to the inverter. To prevent current distortion, the voltage loop is only updated during zero-crossing events.
-
-A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave is generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 100kHz. Using Texas Instruments digital power library blocks, we then generate the sinusoidal reference. The two signals are compare with an onboard analog comparator which is tied to the trip of the PWM signals connected to the H-Bridge. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. 
-
-\section{The Hybrid Algorithm}
-Without being a rehash of Dr. Sanfelice and Jun Chai's paper on the hybrid control of the power inverter\cite{ricardo}, we aim to briefly clarify the mechanisms behind how the hybrid inverter works, and discuss the process we undertook in implementing the algorithm on our custom hardware validation platform. 
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width = 4 in]{hybridISR}
-\caption{Software diagram of the `slow' ~20kHZ hybrid PWM inverter ISR}
-\label{fast}
-\end{center}
-\end{figure}
-
-The derivation of the hybrid control algorithm is roughly as follows: given that the response of a series RLC filter can be thought of as a linear oscillator with a damping term, and given that we have a set of desired output parameters - namely the amplitude of the output voltage, the amplitude of the output current, and the angular frequency $\omega$, then by solving the resultant linear differential equation, we can derive a reference solution for the given system to a perfect sinusoidal driving signal. In reality we will not have a sinusoidal driver, but rather some permutation of a square wave capable of switching between $+V_{dc}$ and $-V_{dc}$, where $V_{dc}$ is the DC bus voltage at the input to the H-Bridge controlled by the state variable $q$. We consider $q=1$ to correspond to $+V_{dc}$, $q=-1$ to correspond to $-V_{dc}$, and $q=0$ to correspond to $0$.   
-
-\begin{figure}[h]
-\begin{center}
-\includegraphics[width = 4 in]{hybridLogic}
-\caption{Flow chart of the logic invloved with executing the `Hybrid Jump Logic' within the hybrid PWM inverter ISR}
-\label{fast}
-\end{center}
-\end{figure}
-
-We can think of the resultant solution to the sinusoidal driver as the ideal to which our system should strive, and therefore any deviation from this ideal can be considered as an error that needs to be corrected by the controller. These errors are detected by building a tracking band around the reference solution; this is done by choosing a neighborhood around the reference solution. Collectively, this region is known as the tracking band. Now, if we consider the instantaneous state of the system to be a vector made up of the capacitor voltage and the current through the inductor, then we can measure the location of the vector in relation to the tracking band on the VI plane. Since the inductor and capacitor are at all times 90 degrees out of phase without any load or perturbation, the ideal solution takes the shape of an ellipse on the VI plane. By taking the state vector's position relative to the tracking band, and knowing the trajectory at a given region on the VI plane, it is straightforward to develop a small set of rules governing the switching of the inverter, i.e. the jump between the three states of the H-bridge circuit, namely $q=1$, $q=-1$, and $q=0$. With this brief foundation, we are able to steer the state of the system around the VI plane, with the resultant output being a pseudo-sinusoid with the desired voltage and current amplitude and frequency. 
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width = 4 in]{jumpMap}
-\caption{Jump Map of the Hybrid Algorithm \cite{ricardo}}
-\label{jump}
-\end{center}
-\end{figure}
-
-As stated previously, PWM algorithms offer a relatively simple means for analyzing the switching waveform since we are modulating a carrier signal of known frequency. This is not quite the case for the hybrid algorithm where the switching occurs in response to where and when the state of the system leaves or enters the tracking band, how often we check it, and the with of the regions $M1$ and $M2$ shown in Figure \ref{jump}.
-
-
-
-
-
+While PWM algorithms offer a relatively simple means for analyzing the switching waveform since we are modulating a carrier signal of known frequency. This is not quite the case for the hybrid algorithm where the switching occurs in response to where and when the state of the system leaves or enters the tracking band, how often we check it, and the with of the regions $M1$ and $M2$ shown in Figure \ref{jump}. An in-depth comparative analysis of the switching behavior of either algorithm is saved for Chapter \ref{Chapter5}.
