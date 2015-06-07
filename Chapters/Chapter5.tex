@@ -92,13 +92,13 @@ For the following subsections, we will refer to the switching pairs (Q1, Q2) and
 \begin{figure}
 \centering
 \includegraphics[width = 3.5in]{hBridge}
-\caption{The H-bridge circuit showing switching pairs (Q1, Q2) and (Q3, Q4)}
+\caption{The H-bridge circuit showing switching-leg pairs (Q1, Q2) and (Q3, Q4)}, and opposing-leg pairs (Q1, Q4) and (Q2, Q3)
 \label{hBridge}
 \end{figure}
 
 
 \subsection{Bipolar PWM}
-The operation of a bipolar switching scheme generally operates as follows
+The operation of a bipolar switching scheme generally operates as follows:
 \begin{equation}
 \begin{cases}
 \label{bipolarStates}
@@ -106,19 +106,33 @@ V_{out} = V_{dc} &\mbox{if V_{ref} > V_{c}}
 V_{out} = -V_{dc} &\mbox{if V_{ref} < V_{c}}
 \end{cases}
 \end{equation}
-
+In this inversion scheme, opposing switching pairs are modulated simulataneously. 
 Where $V_{ref}$ is the reference signal, and $V_c$ is the carrier signal. In Figure \ref{bipolarSwitchingOperation} we can see that $V_{out} = V_{AO}-V_{BO}$ resulting in an output that exists only in one of the two states described in equation \ref{bipolarStates}. If we select an odd modulation index, the output waveform exhibits odd-symetry and we can effectively eliminate all even harmonics at the output.
 
 \begin{figure}
 \centering
-\includegraphics[width = 3.5in]{hBridge}
-\caption{The operation of a bipolar switching scheme for an inverter \cite{fourierAnalysis}}
+\includegraphics[width = 3.5in]{bipolarPwmShot}
+\caption{The operation of a bipolar switching scheme for an inverter. \cite{fourierAnalysis}}
 \label{bipolarSwitchingOperation}
 \end{figure}
 
 \subsection{Unipolar PWM}
+The operation of the unipolar PWM works under the following rules, given a triangular carrier signal and a sinusoidal reference. Note that in Figure \ref{unipolarStates}, $V_{control}_{}$
+\begin{equation}
+\begin{cases}
+\label{unipolarStates}
+V_{out} = V_{dc} &\mbox{if V_{ref} > V_{c}}
+V_{out} = -V_{dc} &\mbox{if V_{ref} < V_{c}}
+V_{out} = 0 &\mbox{if V_{ref} < V_{c}}
+\end{cases}
+\end{equation}
 
-%\subsection{Modified Unipolar PMW}
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{unipolarPwmShot}
+\caption{The operation of a unipolar switching scheme for an inverter. Note that a single control signal is used in our software implementation since each control signal is the other's dual. \cite{fourierAnalysis})
+\label{hBridge}
+\end{figure}
 
 \subsection{Hybrid PWM}
 
