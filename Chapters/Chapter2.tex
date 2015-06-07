@@ -170,42 +170,33 @@ The top layer of the PCB is shown in Figure~\ref{boostPCBTop} and the bottom is 
 \end{figure}
 
 \subsubsection{Boost Converter Efficiency}
-Since this boost converter is designed to operate in a solar powered microinverter \todo[inline]{obvious AF by now}, energy conversion efficiency is an important factor \todo[inline]{just say this, maybe in a few more words}. The design aims to mitigate reduced efficiencies which can limit a system's ability to turn energy from the sun into electrical power and waste this energy as heat \todo[inline]{it is clear that inneficiency is wasted as heat}. Ideally, a switching converter will have a 100\% power conversion rate but in practice this is not feasible. Losses due to parasitic resistances and capacitances in circuit components impair the device's efficiency. Rates in the high ninetieth percentile have been achieved in some switching DC/DC converters but efficiencies falling more in the range of 90\% to 70\% are more common and can be deemed acceptable depending on the application. \todo[inline]{you don't need to explain that inefficiency is waste heat, you don't need to spend more than one sentence saying efficiency is important}
+Energy conversion efficiency is an important factor for determining the effectiveness of the boost converter. Ideally, the circuit will have a 100\% power conversion rate but in practice this is not feasible. Losses occur during periods of conduction and switching due to parasitic resistances and capacitances.  Rates in the high ninetieth percentile have been achieved in some switching DC/DC converters but efficiencies falling more in the range of 90\% to 70\% are more common and can be deemed acceptable depending on the application. 
 
-There are three main areas of the boost converter that contribute to the most significant power losses \todo[inline]{main and significant, wow, much inefficiency in word use}: the switching transistor, the rectifier diode, and the inductor. \todo[inline]{you dont need to state the role that each compnent plays; if this is not clear by now, you havent done your job. Just say transistor, diode, etc.}The heat generating losses are attributed to periods of conduction and switching with the parasitic conditions. Estimates of the diode losses are calculated earlier to be approximately 2.91W for the boost converter operating at close to the 200W rating. Likewise, the MOSFET losses are calculated to be approximately 1.79W. The series resistance of the inductor does not generate heat to justify heatsinking but still reduces the power as estimated in the following equation.
+
+
+A first order estimate of the boost's efficiency $\eta_{est}$, with the MOSFET, diode and inductor loss considerations, is calculated in the following the following equation.
 
 \begin{equation}
-P_L = (I_{in,rms})^2R_L = (5.47A)^2(0.025\Omega) = 0.75W 
+\eta_{est} = \frac{P_{in} - {(P_{sw}+P_L+P_D)}}{P_{in}} = 97\%
 \end{equation}
 
 
-A first order estimate of the boost's efficiency, with the above three loss considerations, is calculated in the following the following equation.
+This is an optimistic conversion efficiency and does not fully encapsulate an array of other possible factors such as component tolerances and capacitive equivalent series resistances. A deviation of 10\% is a fair engineering estimate on how much $\eta_{est}$ could drift.
+
+The boost converter circuit prototype allows efficiency testing under the constraints of a laboratory environment. Experimental efficiency $\eta_{exp}$ is calculated with the relationship shown in the following equation. The operating parameters of the test are: $V_{in} = 12V$,~ $R_{load} = 477.66\Omega$ , $F_{switching} = 50 kHz$. 
 
 \begin{equation}
-\eta_{est} = efficiency_{estimate} = \frac{P_{in} - {(P_{sw}+P_L+P_D)}}{P_{in}} = 97\%
+\eta_{exp} = \frac{P_{out}}{P_{in}} = \frac{{V_{out}}^2/{R_{load}}}{{V_{in}}{I_{in}}}
 \end{equation}
 
-\todo[inline]{do not write out efficiency estimate in math mode. Say eta with the appropriate subscript, then explain that variable in text}
-
-This is an optimistic conversion efficiency and does not fully encapsulate an array of other possible factors such as component tolerances and capacitive equivalent series resistances. A deviation of 10\% is a fair engineering estimate on how much this efficiency could drift.
-
-The boost converter circuit prototype allows efficiency testing under the constraints of a laboratory environment. Efficiency is calculated with the relationship shown in the following equation. The operating parameters of the test are: $V_{in} = 12V$,~ $R_{load} = 477.66\Omega$ , $F_{switching} = 50 kHz$. 
+The test uses different PWM duty cycles between 20\% and 73\% to obtain peak and average efficiencies as shown in the following equation.
 
 \begin{equation}
-\eta_{exp} = efficiency_{experimental} = \frac{P_{out}}{P_{in}} = \frac{{V_{out}}^2{R_{load}}}{{V_{in}}{I_{in}}}
+\eta_{exp,peak} = 85.4\%, ~ \bar{\eta}_{exp} = 83.84\% 
 \end{equation}
-\todo[inline]{same thing here, you do not write out words like this in math mode, use the variable then explain it}
 
-The test uses different PWM duty cycles between 20\% and 73\% to obtain an array of efficiencies as shown in the following equation.
 
-\begin{equation}
-Experimental~~ Efficiencies:  ~~  Peak = 85.4\%, ~ Average = 83.84\% 
-\end{equation}
-\todo[inline]{this is bad style, use the eta variables you defined. Average is denoted with a bar over top, do not write out}
-
-As the testing indicates, the boost converter operates well within the range of standard energy conversion efficiencies. This allows the system to operate without significant undesired heat waste from power drawn from the solar panels.
-
-The boosted output voltage compared to input voltage over different duties is shown in Figure ~\ref{Boost Converter Output Voltage Vs. Duty Cycle} and the voltage gain versus duty is shown in Figure ~\ref{Boost Converter Gain Vs. Duty Cycle}.
+As the testing indicates with $\bar{\eta}_{exp}$, the boost converter operates well within the range of standard energy conversion efficiencies. The boosted output voltage compared to input voltage over different duties is shown in Figure ~\ref{Boost Converter Output Voltage Vs. Duty Cycle} and the voltage gain versus duty is shown in Figure ~\ref{Boost Converter Gain Vs. Duty Cycle}. These results demonstrate how increasing the duty closer to 100\% will increase the output voltage.
 
 \begin{figure}
 \centering
