@@ -51,8 +51,20 @@ When the MOSFET is conducting, the output capacitor provides power to the load u
 \label{DCM Eq}
 \end{equation}
 
-The electrical specifications of this boost converter are listed in Table~\ref{specsBoost}. \\ 
-\todo[inline]{the rest of this section needs work too}
+
+
+The Sharp solar panels we are using feature a nonlinear output voltage and current relationship which depends on lighting conditions as shown in Figure~\ref{panelCharacteristics}. Maximum output power for the $170W$ panels occurs at $V_{pv,max}=34.8V$ and  $I_{pv,max} = 4.9A$. Boost output voltage is based on the minimum value needed for the $120V_{rms}/0.707 = 169.73V$ peak value required for the DC/AC inverter stage input. Maximum rated power of $200W$ is an upper limit selected for this design considering the solar panel approach with microinverter topology. Switching frequency is set at $50 kHz$ based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{solar_v_vs_i.PNG}
+\caption{Solar Panel IV Characteristics\cite{SharpPanel}}
+\label{panelCharacteristics}
+\end{figure}
+\todo[inline]{you need to cite figures all others you used}
+
+The process of designing the boost circuit hardware involved a review of application notes and running PSPICE simulations. The voltage at maximum power of the PV panels $V_{pv,max}$ was selected for primary simulation testing. Calculations were performed to best select power components for operation of the boost converter at high power values. Component requirements for SMPS applications also influence the material composition options for parts. An example of this is the need to use electrolytic capacitors to obtain necessary voltage ratings and storage capabilities. The main design steps consider power dissipation, thermal limits, critical inductance, and critical capacitance. The PSPICE circuit encapsulating the entire boost converter design is shown in Figure~\ref{boostCrct}. The electrical specifications of this boost converter are listed in Table~\ref{specsBoost}. \\ 
+
 
 \begin{table}
 \centering
@@ -60,11 +72,11 @@ The electrical specifications of this boost converter are listed in Table~\ref{s
 \hline
  Parameter & Value \\
  \hline
- $ V_{in} = V_{panel}$ & 0V to 40V DC \\
+ $ V_{in} = V_{panel}$ & 0V to 43.2V DC \\
  \hline
  $ I_{in}$ & 5.47A DC max \\
  \hline
- $ V_{out}=V_{load} $ & 169.73V Min to 200V max \\
+ $ V_{out}=V_{load} $ & 200V DC max \\
  \hline
  $ I_{out} $ & 1.18A DC max \\
  \hline
@@ -72,22 +84,12 @@ The electrical specifications of this boost converter are listed in Table~\ref{s
  \hline
  $ f_{switching} $ & 50 kHz \\
  \hline
+ $\bar{\eta} $ & 83.84 \% \\
+ \hline
 \end{tabular}
 \caption{Electrical Specifications for Boost Converter}
 \label{specsBoost}
 \end{table}
-
-The Sharp solar panels have varying voltage and current output capabilities depending on lighting conditions. Maximum output power for the 170W panels occurs at $V_{panel}=34.8V$ and  $I_{panel} = 4.9A$. An input voltage range will be selected to define a sourcing range with usable power output considering the panels highly nonlinear relationship regarding I vs V shown \todo[inline]{I don't understand what youre trying to say here} in Figure~\ref{panelCharacteristics}. Output voltage is defined based on the minimum value needed for the 120Vrms/0.707 = 169.73V \todo[inline]{this needs to be written in math mode} peak value needed for the DC/AC inverter stage input. Maximum power of 200W is an upper limit buffer set for this design considering the solar panel approach with microinverter topology. Switching frequency is set at 50 kHz based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
-
-\begin{figure}
-\centering
-\includegraphics[width = 3.5in]{solar_v_vs_i.PNG}
-\caption{Solar Panel IV Characteristics}
-\label{panelCharacteristics}
-\end{figure}
-\todo[inline]{you need to cite this figure, and all others you used}
-
-The process of designing the boost circuit hardware involved a review of application notes, and in running PSPICE simulations. PSPICE computer software \todo[inline]{computer software? are you 70?} produced by Cadence\textbackslash{}OrCAD was used to simulate the boost converter. The max power voltage \todo[inline]{power voltage?} of the PV panels was selected for primary simulation testing. Calculations were performed to best select power components for operations of the boost converter at high power values \todo[inline]{how does power affect component values apart from size/rating?}. These design steps considered power dissipation thermal limits, critical inductance, and critical capacitance. The PSPICE circuit encapsulating the entire boost converter design is shown in Figure~\ref{boostCrct}.
 
 \begin{figure}
 \centering
