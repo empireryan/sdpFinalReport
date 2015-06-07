@@ -29,9 +29,7 @@ V=L\frac{\delta i}{\delta t}
  we see that the faster we can change current through the inductor, the larger voltage spike we can capture. This `capture' is done with a diode and capacitor circuit.
 
 \todo[inline]{Ben wrote this}
-A standard PV microinverter contains two principle energy conversion stages with a DC/DC module and DC/AC module. This section highlights the hardware design process of a DC/DC boost converter for solar microinverter implementations. The boost circuit includes many elements and considerations of the final inverter system including power switching hardware and sensor circuits. The boost stage designed is essential for photovoltaics since it allows consistent maximum power sourcing from the panel. Solar panels have nonlinear relationships between output voltage and current. The maximum power product of the electrical values will vary depending on light intensity levels, loading, and temperature. A microcontroller unit (MCU) is used with this boost converter for create a feedback control scheme called a maximum power point tracker (MPPT). A versatile DC/DC boost stage is needed for microinverters since it can dynamically vary power switching based on the MPPT to compensate for the wide range of potential solar panel voltages. This converter topology utilizes a discrete MOSFET for switching since microcontroller interfacing is required. Traditional boost converter integrated circuits (ICs) do not satisfy the MPPT control needs or power requirements needed for this type of system.  \todo[inline]{this whole paragraph needs work. Think about our audience being pretty smart people, try to use some economy with your words}
-
-A generic boost converter circuit shown in Figure~\ref{genericBoost}. Operation of a boost converter has two distinct phases depending on the switch mode of the power MOSFET. The gate of the MOSFET is sent different logic values at specific duty cycles through PWM. When the drive circuit outputs logic high in Figure~\ref{genericBoost}, the drain to source path will conduct in the saturation region. This provides a path to ground for the current flowing through the inductor and reverse biases the clamp diode. Over time energy is built up in the magnetic field of the inductor coil from this solar panel sourced current. Then logic low is sent to the MOSFET to shut it down. Considering the sudden change in current flow, a large voltage kickback occurs across the inductor and forward biases the diode. Current now can flow to charge the output capacitor and feed the load.
+A generic boost converter circuit is shown in Figure~\ref{genericBoost}. The operation of a boost converter has two distinct phases depending on the switching mode of the power transistor. In this design, the gate of a MOSFET is sent different logic values at a specific duty cycles through PWM. When the drive circuit outputs logic high in Figure~\ref{genericBoost}, the drain to source path will conduct since the MOSFET is in the saturation region. This provides a path to ground for the current flowing through the inductor and reverse biases the clamp diode. While the transistor remains on, input current causes energy to be built up in the magnetic field of the inductor coil. Then logic low is sent to the MOSFET to shut it down. Considering the sudden change in current flow, a large voltage kickback occurs across the inductor and forward biases the diode. Current now can flow to charge the output capacitor and feed the load.
 
 \begin{figure}
 \centering
@@ -40,7 +38,19 @@ A generic boost converter circuit shown in Figure~\ref{genericBoost}. Operation 
 \label{genericBoost}
 \end{figure}
 
-When the MOSFET is conducting, the output capacitor provides power to the load until it receives new charge during the second period. Due to the switching characteristics and inductor physics, a large ripple current flows through the inductor. An important design constraint it to make sure the inductor current always remains greater than zero such that continuous conduction mode (CCM) is maintained. CCM ensures a desired voltage transfer function for gain in this design. Additionally, there are some parasitic elements included in the circuit that contribute to power loss. These undesired effects include the DC resistance of the inductor windings and the equivalent series resistance of the capacitor.  
+When the MOSFET is conducting, the output capacitor provides power to the load until it receives new charge during the second switching mode. A large ripple current flows through the inductor as the switching takes place. An important design constraint is to make sure that the inductor current always remains greater than zero such that continuous conduction mode (CCM) is maintained. CCM ensures that the voltage gain function remains a in linear relation solely with duty cycle $D$ as shown in Equation \ref{CCM Eq}. Discontinuous conduction mode (DCM) occurs when inductor current drops to zero during a switching cycle. The gain function for DCM, shown in Equation ~\ref{DCM Eq}, is more complex since it includes additional circuit parameters like inductance and is dependent on the load. 
+
+\begin{equation}
+\frac{V_{out}}{V_{in}} =  \frac{1}{1-D}
+\label{CCM Eq}
+\end{equation}   
+
+
+\begin{equation}
+\frac{V_{out}}{V_{in}} = 1 + \frac{V_{in}D^2T}{2LI_{out}}
+\label{DCM Eq}
+\end{equation}
+
 The electrical specifications of this boost converter are listed in Table~\ref{specsBoost}. \\ 
 \todo[inline]{the rest of this section needs work too}
 
@@ -67,7 +77,7 @@ The electrical specifications of this boost converter are listed in Table~\ref{s
 \label{specsBoost}
 \end{table}
 
-The Sharp solar panels, utilized in this design as an input power source, \todo[inline]{the fuck else would we use them for?} will have varying voltage and current output capabilities depending on lighting conditions. Maximum output power for the 170W panels occurs at $V_{panel}=34.8V$ and  $I_{panel} = 4.9A$. An input voltage range will be selected to define a sourcing range with usable power output considering the panels highly nonlinear relationship regarding I vs V shown \todo[inline]{I don't understand what youre trying to say here} in Figure~\ref{panelCharacteristics}. Output voltage is defined based on the minimum value needed for the 120Vrms/0.707 = 169.73V \todo[inline]{this needs to be written in math mode} peak value needed for the DC/AC inverter stage input. Maximum power of 200W is an upper limit buffer set for this design considering the solar panel approach with microinverter topology. Switching frequency is set at 50 kHz based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
+The Sharp solar panels have varying voltage and current output capabilities depending on lighting conditions. Maximum output power for the 170W panels occurs at $V_{panel}=34.8V$ and  $I_{panel} = 4.9A$. An input voltage range will be selected to define a sourcing range with usable power output considering the panels highly nonlinear relationship regarding I vs V shown \todo[inline]{I don't understand what youre trying to say here} in Figure~\ref{panelCharacteristics}. Output voltage is defined based on the minimum value needed for the 120Vrms/0.707 = 169.73V \todo[inline]{this needs to be written in math mode} peak value needed for the DC/AC inverter stage input. Maximum power of 200W is an upper limit buffer set for this design considering the solar panel approach with microinverter topology. Switching frequency is set at 50 kHz based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
 
 \begin{figure}
 \centering
