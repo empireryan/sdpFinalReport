@@ -31,7 +31,7 @@ The two primary tasks of the software system are undoubtedly the control of the 
 \end{figure}
 
 \subsection{State Framework}
-Although simple state frameworks are possible using functions as a sort of 'pseudo state,' these implementations tend to become exceedingly complex and ahrd to follow for non-trivial state machines. Further, cobbling together new state machines or adding new states can be a daunting task with the resulting spaghetti code. 
+Although simple state frameworks are possible using functions as a sort of 'pseudo state,' these implementations tend to become exceedingly complex and hard to follow for non-trivial state machines. Further, cobbling together new state machines or adding new states can be a daunting task resulting in spaghetti code. 
 
 For these reasons, we decided to 'roll our own' state framework using objected oriented patterns in C. This involved creating an FSM structure that holds a reference to an FSM object. This FSM object is actually a type defined variable that is, loosely speaking, of the type 'pointer to function'. Additionally, this strategy necessitated the implementation of several helper functions for various tasks like constructing the FSM object, state initialization, state transitions, and event dispatching. 
 
@@ -51,7 +51,7 @@ struct Fsm
 };
 \end{lstlisting}
 
-The Fsm struct stores the function pointer as its sole attribute. Note that I'm using the trailing underscores to indicate that the variable is private and should not be tampered with in a nod to the Python style of adding leading underscores to indicate such members of classes. I will probably switch to leading underscores in a later revision, but this is wholly unrelated to the current discussion.
+The Fsm struct stores the function pointer as its sole attribute. Note that we use the trailing underscores to indicate that the variable is private and should not be tampered with in a nod to the Python style of adding leading underscores to indicate such members of classes. 
 
 Students of electrical and computer engineering should be familiar with the concept that state machines respond to what are formally known as 'input alphabets.' These alphabets have strict definitions from a mathematical standpoint, but for our purposes, all we need to understand is that the machine should transition according to a certain mapping if it gets an event, and should - typically - do nothing if we do not send it an event. Accordingly, we should also declare some structure to manage event signals. This is done with
 
@@ -64,7 +64,7 @@ struct Event
 
 At this point we're ready to implement the functions that will manage this framework and allow for the creation of arbitrary state machines. These functions are inlined for speed - they eliminate a lot of the overhead of normal function calls - and they are well suited to this implementation since we are very concerned with speed and efficiency on our micros.
 
-First up, we need to initialize the current state, i.e. give it something to point to, i.e. we will create an Fsm struct and invoke a function pointer for it to use. We will also set this pointer to the initial state of the FSM. We will do this with:
+First up, we need to initialize the current state, i.e. give it something to point to. We will create an Fsm struct and invoke a function pointer for it to use. We will also set this pointer to the initial state of the FSM. We will do this with:
 
 \begin{lstlisting}
 #define _FsmCtor_(self_, init_) ((self_)->state__ = (State)(init_))
@@ -88,9 +88,7 @@ This will take some member of our particular Event structure that we defined abo
 #define _FsmTran_(self_, targ_) ((self_)->state__ = (State)(targ_))
 \end{lstlisting}
 Because the implementation of the state framework was, in our collective opinion, a major design hurdle, we feel it is productive to give the user a sense of the simplicity that this implementation imparts on FSM implementations. This is a particularly useful feature for us since we have several state machines in our systems, and the overall software design goal is extensibility.  
-\\
-\\
-\\
+
 \begin{lstlisting}
 int main()
 {
@@ -131,7 +129,7 @@ In order to assess the performance of the hybrid controller, we first needed to 
 
 Since the DC bus is not regulated by the boost stage feeding the inverter, the inverter itself uses nested control loops; the inner loop is for voltage control, and the outer loop employs current control. The voltage loop is used to provide a reference to the current loop; as the inverter is loaded and current demand increases, it is natural for the voltage to sag. The current reference at any instant is used with a software PID controller to provide the duty cycle to the inverter. To prevent current distortion, the voltage loop is only updated during zero-crossing events.
 
-A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave is generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 100kHz. Using Texas Instruments digital power library blocks, we then generate the sinusoidal reference. The two signals are compare with an onboard analog comparator which is tied to the trip of the PWM signals connected to the H-Bridge. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. 
+A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 20kHz in the case of the inverter's PWM. Using the Texas Instruments digital power library blocks, we then generate the sinusoidal reference. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. Inverse logic is true during the negative half-cycle. These comparisions are done by the PWM driver function, which is fed by the PID controllers of the inverter loop.
 
 \section{Hybrid Algorithm Implementation Details}
 In the initial stages of research and development, the hybrid inverter team first sought to recreate the simulations described in \cite{ricardo}. These simulations were best accomplished using the Hybrid Equations Toolbox in Matlab. Although the particulars of this implementation would be quite different than the final implementation in hardware, it was an excellent exercise in understanding the particulars of the algorithm, and also to give us a reference while implementing the hybrid controller on the C2000 micro controller in C. 
@@ -150,7 +148,7 @@ In the code, 'qplus' refers to the state that we're going to jump to, and 'pplus
 This is the bulk of the code for the Matlab simulations, though we have omitted the description of the behavior of the system as the solution flows, as this is covered in detail in \cite{ricardo}.
 
 \subsection{The C Implementation on the C2000}
-Without being a rehash of Dr. Sanfelice and Jun Chai's paper on the hybrid control of the power inverter\cite{ricardo}, we aim to briefly clarify the mechanisms behind how the hybrid inverter works, and discuss the process we undertook in implementing the algorithm on our custom hardware validation platform. 
+We aim to briefly clarify the mechanisms behind how the hybrid inverter works, and discuss the process we undertook in implementing the hybrid algorithm on our custom hardware validation platform. 
 
 \begin{figure}[h]
 \begin{center}
@@ -160,7 +158,7 @@ Without being a rehash of Dr. Sanfelice and Jun Chai's paper on the hybrid contr
 \end{center}
 \end{figure}
 
-The derivation of the hybrid control algorithm is roughly as follows: given that the response of a series RLC filter can be thought of as a linear oscillator with a damping term, and given that we have a set of desired output parameters - namely the amplitude of the output voltage, the amplitude of the output current, and the angular frequency $\omega$, then by solving the resultant linear differential equation, we can derive a reference solution for the given system to a perfect sinusoidal driving signal. In reality we will not have a sinusoidal driver, but rather some permutation of a square wave capable of switching between $+V_{dc}$ and $-V_{dc}$, where $V_{dc}$ is the DC bus voltage at the input to the H-Bridge controlled by the state variable $q$. We consider $q=1$ to correspond to $+V_{dc}$, $q=-1$ to correspond to $-V_{dc}$, and $q=0$ to correspond to $0$. This process is illustrated clearly in Figure \ref{jumpMap}.
+The derivation of the hybrid control algorithm is roughly as follows: given that the response of a series RLC filter can be thought of as a linear oscillator with a damping term, and given that we have a set of desired output parameters - namely the amplitude of the output voltage, the amplitude of the output current, and the angular frequency $\omega$, then by solving the resultant linear differential equation, we can derive a reference solution for the given system to a perfect sinusoidal driving signal. In reality we will not have a sinusoidal driver, but rather some permutation of a square wave capable of switching between $+V_{dc}$, $-V_{dc}$ and $0$, where $V_{dc}$ is the DC bus voltage at the input to the H-Bridge controlled by the state variable $q$. We consider $q=1$ to correspond to $+V_{dc}$, $q=-1$ to correspond to $-V_{dc}$, and $q=0$ to correspond to $0$. This process is illustrated clearly in Figure \ref{jumpMap}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -169,7 +167,6 @@ The derivation of the hybrid control algorithm is roughly as follows: given that
 \label{jump}
 \end{center}
 \end{figure}
-
 
 We can think of the resultant solution to the sinusoidal driver as the ideal to which our system should strive, and therefore any deviation from this ideal can be considered as an error that needs to be corrected by the controller. These errors are detected by building a tracking band around the reference solution; this is done by choosing a neighborhood around the reference solution. Collectively, this region is known as the tracking band. Now, if we consider the instantaneous state of the system to be a vector made up of the capacitor voltage and the current through the inductor, then we can measure the location of the vector in relation to the tracking band on the VI plane. Since the inductor and capacitor are at all times 90 degrees out of phase without any load or perturbation, the ideal solution takes the shape of an ellipse on the VI plane. By taking the state vector's position relative to the tracking band, and knowing the trajectory at a given region on the VI plane, it is straightforward to develop a small set of rules governing the switching of the inverter, i.e. the jump between the three states of the H-bridge circuit, namely $q=1$, $q=-1$, and $q=0$. With this brief foundation, we are able to steer the state of the system around the VI plane, with the resultant output being a pseudo-sinusoid with the desired voltage and current amplitude and frequency. 
 
@@ -205,7 +202,7 @@ The PWM driver function was written as follows:
   breakatwhitespace=true,
   tabsize=1
 }
-\begin{lstlisting}
+\begin{lstlisting}[label={lst:driver}]
 #define PWMDRV_Hybrid(v)
 	if ( v == VDC)
 	{
@@ -224,8 +221,7 @@ The PWM driver function was written as follows:
 #endif
 \end{lstlisting}
 
-Putting a zero in the CMPA register of leg 2 (n+1) means that the high side fet on leg 2 is off, and the low side fet is on.
-Putting TBPRD+1 in the CMPA register of  leg 1 means that the low side fet is off, while the high side fet is on. 
+As shown in code example \ref{lst:driver}, putting a zero in the CMPA register of leg 2 (n+1) means that the high side fet on leg 2 is off, and the low side fet is on. Putting TBPRD+1 in the CMPA register of  leg 1 means that the low side fet is off, while the high side fet is on. 
 The result is a current path from vdc through the load, and back down to ground (effectively $+V_{dc}$ at the load). Following an inverse logic, we can achieve $-V_{dc}$ at the load, as well as connecting the load to ground - effectively placing zero volts at the load - by driving both low side FETs.
 
 After having properly configured the PWM modules for operation of an H-bridge, we can use the driver function to update the state of the H-Bridge with deadband for shoot-through protection. This driver function is called after the transition logic is executed, and the transition logic is executed only after the current state variable is constructed. Let's examine the update of the state variable on each iteration of the inverter ISR. 
@@ -233,7 +229,7 @@ After having properly configured the PWM modules for operation of an H-bridge, w
 \todo[inline]{update this as we calculate the phase and clarify logic!}
 \begin{lstlisting}
 	Vac_in = (long)((long)Vac_FB<<9)-Offset_Volt;	// shift to convert to Q21
-	inv_ref_cur_inst = _IQ24mpy(inv_Iset, (((long) (InvSine)) << 9)) ;
+	inv_ref_cur_inst = _IQ24mpy(inv_Iset, (((long) (InvSine)) << 9));
 
 	inv_meas_cur_lleg1_inst=(((long) Ileg1_fb) <<12)-_IQ24(0.5);
 	inv_meas_cur_lleg2_inst=(((long) Ileg2_fb) <<12)-_IQ24(0.5);
@@ -243,7 +239,7 @@ After having properly configured the PWM modules for operation of an H-bridge, w
 	inv_meas_vol_inst =((long)((long)Vac_FB<<12)-_IQ24(0.5))<<1;	// shift to convert to Q24
 
 
-	updateState(&state, inv_ref_cur_inst, inv_meas_vol_inst, phase);		//update the
+	updateState(&state, inv_ref_cur_inst, inv_meas_vol_inst, phase);
 \end{lstlisting}
  
 Once the state variable has been updated for the current iteration of the ISR, the state variable can be passed to the state machine operating the hybrid algorithm. This is done with the following code:
@@ -252,14 +248,23 @@ Once the state variable has been updated for the current iteration of the ISR, t
 \begin{lstlisting}
 char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable state)
 {
-    void    *funptr = self.super_.state__;    
+
+    void   *funptr = self.super_.state__;
+
+    il = state.current;
+    vc = state.voltage;
+    q = state.bridgeState;
+    p = state.controller;
+    
+    /**
+     * Determine which set the state variable belongs to: C or D
+     */
     
     //Reset set membership status
     inC = false;   
     inD = false;
 
-    Vz0 = (state.current/ALPHA)^2 + (state.voltage/BETA)^2;		//The current solution to the system
-
+    Vz0 = (il/ALPHA)^2 + (vc/BETA)^2;
 
     /**
      * Supervisory Controller 
@@ -267,13 +272,35 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
      */
     if(state.controller == GLOBAL){
         if((Vz0 >= CIN) && (Vz0 <= COUT)){      // are we between the two tracking bands? -> select forward controller
-            state -> controller = FORWARD;
+            state.controller = FORWARD;
             //inD = true;
         }
     }
     else if(state.controller == FORWARD){
         if((Vz0 >= COUT) || (Vz0 <= CIN)){      // are we inside both, or outside both tracking bands? -> select global controller
-            state -> controller = GLOBAL;
+            state.controller = GLOBAL;
+        }
+    }
+
+    /** Forward Controller Check */
+    if(state.controller == FORWARD)           
+    {      
+        if((Vz0 >= CIN) && (Vz0 <= COUT)){
+            inC = true;
+        }
+        else{
+            inC = false;            
+        }
+
+    }
+    /** Global Controller Check */
+    else if(state.controller == GLOBAL)   
+    {     
+        if((Vz0 <= CIN) && (Vz0 >= COUT)){
+            inC = true;
+        }
+        else{
+            inC = false;            
         }
     }
 
@@ -292,22 +319,21 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
     if(state.controller == FORWARD)           
     {      
         if(q != 0){
-
-           if( (abs(Vz0-cin) <= err) && (il*q <= 0)){
+           if( (abs(Vz0-cin) <= ERR) && (il*q <= 0)){
                inD = 1;
            }
-           else if( (abs(Vz0-cout) <= err) && (il*q >= 0)){
+           else if( (abs(Vz0-cout) <= ERR) && (il*q >= 0)){
                inD = 1;
            }
        }
         else if (q == 0){
-            if( (abs(Vz0-cin) <= err) && (q == 0)){
+            if( (abs(Vz0-cin) <= ERR) && (q == 0)){
                 inD = 1;
             }
         }
     }
 
-    /** Global Controller Check */
+    /** Global Controller CHeck */
     if(state.controller == GLOBAL){
         if((Vz0 >= cin) && (Vz0 <= cout)){
             inD = 1;
@@ -323,17 +349,17 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
         /**
          * For the Hfw Controller
          */
-        if(State.controller == FORWARD){    
-            if(State.bridgeState != NEG_VDC){
-                if( ((abs(Vz0-cout) <= err) && (il >= 0) && (~M1)) || (((abs(Vz0-cin) <= err)) && (il <= 0)) ){
+        if(p == FORWARD){
+            if(q != NEG_VDC){
+                if( ((abs(Vz0-cout) <= ERR) && (il >= 0) && (~M1)) || (((abs(Vz0-cin) <= ERR)) && (il <= 0)) ){
                 qplus = NEG_VDC;
                 }
             }
-            else if ( ((M1) && (abs(il - mEpsilon) >= err) && (q == 1)) || ((M2) && (abs(il + mEpsilon) >= err) && (q == -1)) ){
+            else if ( ((M1) && (abs(il - EPSILON) >= ERR) && (q == 1)) || ((M2) && (abs(il + EPSILON) >= ERR) && (q == -1)) ){
                     qplus = ZERO_VDC;
                 }
-            else if(State.bridgeState != VDC){
-                if( ((abs(Vz0 - cout) <= err) && (il <= 0) && (~M2)) || (((abs(Vz0 - cin) <= err)) && (il >= 0)) ){
+            else if(q != VDC){
+                if( ((abs(Vz0 - cout) <= ERR) && (il <= 0) && (~M2)) || (((abs(Vz0 - cin) <= ERR)) && (il >= 0)) ){
                     qplus = VDC;
                 }
             }
@@ -345,7 +371,7 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
         /**
          * For the Hg Controller
          */
-        else if(State.controller == GLOBAL){
+        else if(p == GLOBAL){
             if(Vz0 <= CIN){
                 qplus = VDC;
             }
@@ -360,9 +386,10 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
 
     if(pplus != NO_EVENT){
         e->super_.signal = qplus;
+        state.controller = qplus;       //q = qplus
     }
 
-    return 0;
+    return qplus;
 }
 \end{lstlisting}
 
