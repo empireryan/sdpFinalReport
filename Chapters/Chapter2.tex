@@ -98,7 +98,7 @@ The process of designing the boost circuit hardware involved a review of applica
 \label{boostCrct}
 \end{figure}
 
-The operation of the boost converter in PSPICE required a switching signal to control the power MOSFET. Implementation of the converter will utilize C2000 MCU logic signals and Silicon Labs gate driver circuits for MOSFET switching. This simulation uses a variable duty cycle pulse source \todo[inline]{pulse source? just say duty cycle} for continuous switching at the set frequency. This configuration is currently being run open-loop, but will include a compensation feedback control circuit to maintain stable output voltage in the final design. The solar panel 34.8V input at max power required a duty cycle set at 80.13\% for the PWM switching signal to achieve 169.73Vdc \todo[inline]{needs to be math mode} out. A load of 143.83$\Omega$ \todo[inline]{put numbers in math mode}was connected at the output to simulate max power current draw and realize the 200W capability of the system. Real output power will be less in practice due to additional inefficiencies, panel operating conditions, and sourcing configuration capabilities. The output power, current and voltage as the boost converter approaching\todo[inline]{read this out loud} steady-state conditions from start-up are shown in the simulation plot of Figure~\ref{boostApproachSteady}. \todo[inline]{simulation plot? you don't plot a simulation, you plt its results}
+The operation of the boost converter in PSPICE required a switching signal to control the power MOSFET. Implementation of the converter will utilize function generator logic signals and Silicon Labs gate driver circuits for MOSFET switching. This simulation uses a variable duty cycle for continuous switching at the set frequency. This configuration is currently being run open-loop, but will include a compensation feedback control system to maintain stable output voltage in the final design. The solar panel $34.8V$ input at max power requires a duty cycle set at $80.13\%$ for the PWM switching signal to achieve $169.73V$ out. A load of $143.83\Omega$ is connected at the output to simulate max power current draw and realize the $200W$ capability of the system. Real output power will be less in practice due to additional inefficiencies, panel operating conditions, and sourcing configuration capabilities. The output voltage, current, and power of the boost converter, as it approaches steady-state conditions from start-up, are shown in the simulation results of Figure~\ref{boostApproachSteady}. 
 
 \begin{figure}
 \centering
@@ -107,7 +107,22 @@ The operation of the boost converter in PSPICE required a switching signal to co
 \label{boostApproachSteady}
 \end{figure}
 
-This boost converter was designed to operate in continuous condition mode (CCM). Ensuring this condition meant that the inductor current will \todo[inline]{you say ensuring this condition meant... then you give a definition of what CCM is. Say what CCM is, then say how you prevent it} never fall to zero and the panels are always sourcing current. This was achieved by selecting an inductor value above the calculated critical inductance and making sure it has appropriate current handling capabilities. Figure~\ref{inductorCurrent} shows the rippled inductor current in CCM and the MOSFET switching signal that creates these dynamic effects in the boost converter. 
+\todo[inline]{proofread remaining restructured/redone content below}
+
+The simulation and prototype boost circuits are operated open-loop so manual variation of duty cycle is required to obtain a certain output. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%. 
+
+This boost converter was designed to operate in continuous condition mode (CCM). This was achieved by selecting an inductor value above the calculated critical inductance and making sure it has appropriate current handling capabilities. CCM requires the average inductor current to be larger than at least half of the load current $I_L$. Tthis is factored into the inductance calculation of Equation ~\ref{Lcrit Eq}.  Figure~\ref{inductorCurrent} shows the rippled inductor current in CCM and the MOSFET switching signal that creates these dynamic effects. 
+
+\begin{equation}
+ L_{critical} \ge \frac{R_{load,maxpower}D(1-D)^2}{2f_{sw}}= 50 \mu F
+\label{Lcrit Eq}
+\end{equation}
+
+The series resistance of the inductor  does not generate enough heat to justify heatsinking considering its large copper construction but still dissipates power as estimated in the following equation.
+
+\begin{equation}
+P_L = (I_{in,rms})^2R_L = (5.47A)^2(0.025\Omega) = 0.75W 
+\end{equation}
 
 \begin{figure}
 \centering
@@ -116,7 +131,35 @@ This boost converter was designed to operate in continuous condition mode (CCM).
 \label{inductorCurrent}
 \end{figure}
 
-Another factor influencing the switching of the MOSFET is the maximum power-point tracking (MPPT) algorithm implemented by the microcontroller. This works to vary the input impedance of the converter as seen by the panel to optimize power output at 34.8V. \todo[inline]{I dont know that its appropriate to talk about MPPT here, you dont explain how it affects switching, just that it will. Let's make a section for MPPT in software}This method uses feedback control based on the voltage and currents measured by the ADC to perturb and observe the boost condition. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%. \todo[inline]{more evidence that MPPT is out of place here - if we don't know what the MPPT is, how are we gonna give a fixed duty cycle? You need to make it clear that the hardware alons is open loop, only with software does it become a living thing}
+
+The clamp diode was selected to be a Silicon Carbide (SiC) Schottky since it offers fast recovery times with low reverse recovery charge $Q_{rr}$ for reduced switching losses. Since the diode resides in the power conduction path, energy dissipation was analyzed. The diode was modeled as a series circuit of a temperature dependent voltage source $ V_{diode}$ and resistance $R_{diode}$.\cite{CREE}
+\begin{equation}
+ V_{diode} = \alpha T_{junction}+V_{diode,0} =  0.95V 
+\end{equation}
+\begin{equation}
+ R_{diode} = \beta T_{junction}+R_{diode,0} = 0.103\Omega
+\end{equation}
+\begin{equation}
+ P_{cond} = {I_{diode,rms}}^2R_{diode}+I_{out,max}V_{diode} = 2.76W
+\end{equation}
+\begin{equation}
+ I_{diode,rms} = \frac{I_{out}}{\eta} \sqrt[]{ \frac{16V_{out}}{3 \pi V_{in}}}= 3.99A
+\end{equation}
+\begin{equation}
+P_{switching} = Q_{c,diode}V_{out}f_{sw}=0.14W
+\end{equation}
+\begin{equation}
+ P_{dissipation,diode,total}= P_{conduction}+P_{switching}=2.91W 
+\end{equation}
+Since \todo[inline]{address heatsinking} heat sinked with a TO-220 bolt-on type sink.
+
+	The output capacitance was designed as a parallel arrangement of two values of capacitance for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
+\begin{equation}
+Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
+\end{equation}
+\begin{equation}
+C_{critical} \ge \frac{V_{out}D}{F_{sw}\delta V_{out}R_{load,maxpower}} = 370 \mu F
+\end{equation}
 
 Ratings on voltages and currents concerning components were determined through worst case calculations.\cite{kwasinski} 
 \begin{equation}
@@ -131,45 +174,8 @@ I_L = I_{diode} = I_{drain} = \frac{2}{\sqrt[2]{3}}I_{in,rms}
 \begin{equation}
 I_{cap} = I_{out,rms} = 1.18A 
 \end{equation}
-The clamp diode was selected to be a Silicon Carbide (SiC) schottky type \todo[inline]{remove `type', this is obvious, requires a rewrite of this sentence} since it offers fast recovery times with low reverse recovery charge $Q_{rr}$ for reduced switching losses. Since the diode resides in the power conduction path, energy dissipation was analyzed. The diode was modeled as a series circuit of a temperature dependent voltage source $ V_{diode}$ and resistance $R_{diode}$.\cite{CREE}
-\begin{equation}
- V_{diode} = \alpha T_{junction}+V_{diode,0} =  0.95V 
-\end{equation}
-\begin{equation}
- R_{diode} = \beta T_{junction}+R_{diode,0} = 0.103\Omega
-\end{equation}
-\begin{equation}
- P_{cond} = {I_{diode,rms}}^2R_{diode}+I_{out,max}V_{diode} = 2.76W
-\end{equation}
-\begin{equation}
- I_{diode,rms} = \frac{I_{out}}{\eta} \sqrt[2]{ \frac{16V_{out}}{3 \pi V_{in}}}= 3.99A
-\end{equation}
-\begin{equation}
-P_{switching} = Q_{c,diode}V_{out}f_{sw}=0.14W
-\end{equation}
-\begin{equation}
- P_{dissipation,diode,total}= P_{conduction}+P_{switching}=2.91W 
-\end{equation}
-This power dissipation falls within the limits of the diode \todo[inline]{this reads awkwardly, you need to introudce this fact from your numbers like ``so it was shown that...''}, but for good measure it will be heat sinked with a TO-220 bolt-on type sink and thermal grease. \todo[inline]{we did not use thermal grease}
-	The output capacitance was designed as a parallel arrangement of two types \todo[inline]{they are not two different types, they are the same type with different values} of capacitors for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance limit \todo[inline]{tolerance limit? this is redundant}. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
-\begin{equation}
-Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
-\end{equation}
-\begin{equation}
-C_{critical} \ge \frac{V_{out}D}{F_{sw}\delta V_{out}R_{load,maxpower}} = 370 \mu F
-\end{equation}
 
-Additionally, the continuous conduction mode requirement sets a minimum valued critical inductance. \todo[inline]{this is super out of place. you mention ccm a couple paragraphs ago. Dont just spit out all your calculations at once, give them as they come}This was calculated to ensure current always remained flowing through the inductor.\cite{hasaneen}
-
-\begin{equation}
- L_{critical} \ge \frac{R_{load,maxpower}D(1-D)^2}{2f_{sw}}= 50 \mu F
-\end{equation}
-
-The philosophy of modular design is being practiced with the hardware development. \todo[inline]{I hate this sentence. Get it out of my sight} The boost converter circuit is first being prototyped as a stand-alone unit that can be tested. Necessary interface connections \todo[inline]{interface conncetions? redundant. you need to read this stuff out loud} with this board will be input power from the solar panel, output power for H-bridge, PWM control, input voltage feedback, output voltage feedback, input current feedback, and switch current feedback. Additionally, logic power rails of 12V, 5V and 3.3V will be supplied. A abstracted representation of the boost converter is detailed in Figure~\ref{boostCrct}. \todo[inline]{bad sentence, fix}
-
-\todo[inline]{this whole (previous) paragraph seems super out of place considering the organization of this whole section, it is clear that there are many modules}
-
-The board was schematic captured and PCB laid out in Eagle \todo[inline]{read this out loud, bad sentence. many better ways to say this}. The circuit schematic shows the conventional boost converter, the associated sensing and signal conditions circuits, and the gate driver circuit. Figure~\ref{boostCompleteSchematic} contains this schematic which had many design concepts inspired by the Texas Instruments Solar Explorer Development environment.\cite{tiAppReportControl} The energy conversion portion of the boost board is shown in Figure~\ref{boostConverterCircuit} with an additional input filter capacitor bank. The sensing of the PV panel voltage and output voltage consisted of basic divider circuits with MCU pin protection diodes as shown in Figure~\ref{VpvSenseCircuit} and Figure~\ref{VboostSenseCircuit}. The input DC PV \todo[inline]{is it not obviuos that PV current is DC by now?}current is measured with a current shunt resistor IC with high common-mode rejection in Figure~\ref{IpvSenseCircuit}. The switching transistor current is measured with a differential op-amp configuration as shown in Figure~\ref{IswSenseCircuit}. Lastly, the switched MOSFET has a low-side gate driver IC taking in PWM as depicted in Figure~\ref{gateDriverCircuit}. 
+Figure~\ref{boostCompleteSchematic} contains this schematic which had many design concepts inspired by the Texas Instruments Solar Explorer Development environment.\cite{tiAppReportControl} The circuit schematic shows the conventional boost converter, the associated sensing and signal conditions circuits, and the gate driver circuit. The energy conversion portion of the boost board is shown in Figure~\ref{boostConverterCircuit} with an additional input filter capacitor bank. The sensing of the PV panel voltage and output voltage consisted of basic divider circuits with MCU pin protection diodes as shown in Figure~\ref{VpvSenseCircuit} and Figure~\ref{VboostSenseCircuit}. The input PV current is measured with a shunt resistor IC with high common-mode rejection in Figure~\ref{IpvSenseCircuit}. The switching transistor current is measured with a differential op-amp configuration as shown in Figure~\ref{IswSenseCircuit}. Lastly, the switched MOSFET has a low-side gate driver IC taking in PWM as depicted in Figure~\ref{gateDriverCircuit}. 
 
 
 The top layer of the PCB is shown in Figure~\ref{boostPCBTop} and the bottom is shown in Figure~\ref{boostPCBBottom}. The first generation prototype boost board PCB was created using a LPKF Protomat M60 router. This machine allows modified PCB gerber files to be milled into two-layer boards from standard copper clad plates. The resulting unpopulated boost board is shown in Figure~\ref{unpopulatedBoostPCB}. The board was then populated with components into a completed circuit as shown in Figure~\ref{Built Boost} Testing of the boost circuit configured its voltage gain capabilities with outputs reaching in excess of 120V with open-loop testing.
