@@ -45,13 +45,10 @@ When the MOSFET is conducting, the output capacitor provides power to the load u
 \label{CCM Eq}
 \end{equation}   
 
-
 \begin{equation}
 \frac{V_{out}}{V_{in}} = 1 + \frac{V_{in}D^2T}{2LI_{out}}
 \label{DCM Eq}
 \end{equation}
-
-
 
 The Sharp solar panels we are using feature a nonlinear output voltage and current relationship which depends on lighting conditions as shown in Figure~\ref{panelCharacteristics}. Maximum output power for the $170W$ panels occurs at $V_{pv,max}=34.8V$ and  $I_{pv,max} = 4.9A$. Boost output voltage is based on the minimum value needed for the $120V_{rms}/0.707 = 169.73V$ peak value required for the DC/AC inverter stage input. Maximum rated power of $200W$ is an upper limit selected for this design considering the solar panel approach with microinverter topology. Switching frequency is set at $50 kHz$ based on recommended ranges and to compare to the TI Solar Explorer Development Board also used in this project.\cite{SharpPanel}
 
@@ -107,8 +104,6 @@ The operation of the boost converter in PSPICE required a switching signal to co
 \label{boostApproachSteady}
 \end{figure}
 
-\todo[inline]{proofread remaining restructured/redone content below}
-
 The simulation and prototype boost circuits are operated open-loop so manual variation of duty cycle is required to obtain a certain output. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%. 
 
 This boost converter was designed to operate in continuous condition mode (CCM). This was achieved by selecting an inductor value above the calculated critical inductance and making sure it has appropriate current handling capabilities. CCM requires the average inductor current to be larger than at least half of the load current $I_L$. Tthis is factored into the inductance calculation of Equation ~\ref{Lcrit Eq}.  Figure~\ref{inductorCurrent} shows the rippled inductor current in CCM and the MOSFET switching signal that creates these dynamic effects. 
@@ -153,7 +148,7 @@ P_{switching} = Q_{c,diode}V_{out}f_{sw}=0.14W
 \end{equation}
 Since \todo[inline]{address heatsinking} heat sinked with a TO-220 bolt-on type sink.
 
-	The output capacitance was designed as a parallel arrangement of two values of capacitance for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
+The output capacitance was designed as a parallel arrangement of two values of capacitance for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
 \begin{equation}
 Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
 \end{equation}
@@ -177,7 +172,6 @@ I_{cap} = I_{out,rms} = 1.18A
 
 Figure~\ref{boostCompleteSchematic} contains this schematic which had many design concepts inspired by the Texas Instruments Solar Explorer Development environment.\cite{tiAppReportControl} The circuit schematic shows the conventional boost converter, the associated sensing and signal conditions circuits, and the gate driver circuit. The energy conversion portion of the boost board is shown in Figure~\ref{boostConverterCircuit} with an additional input filter capacitor bank. The sensing of the PV panel voltage and output voltage consisted of basic divider circuits with MCU pin protection diodes as shown in Figure~\ref{VpvSenseCircuit} and Figure~\ref{VboostSenseCircuit}. The input PV current is measured with a shunt resistor IC with high common-mode rejection in Figure~\ref{IpvSenseCircuit}. The switching transistor current is measured with a differential op-amp configuration as shown in Figure~\ref{IswSenseCircuit}. Lastly, the switched MOSFET has a low-side gate driver IC taking in PWM as depicted in Figure~\ref{gateDriverCircuit}. 
 
-
 The top layer of the PCB is shown in Figure~\ref{boostPCBTop} and the bottom is shown in Figure~\ref{boostPCBBottom}. The first generation prototype boost board PCB was created using a LPKF Protomat M60 router. This machine allows modified PCB gerber files to be milled into two-layer boards from standard copper clad plates. The resulting unpopulated boost board is shown in Figure~\ref{unpopulatedBoostPCB}. The board was then populated with components into a completed circuit as shown in Figure~\ref{Built Boost} Testing of the boost circuit configured its voltage gain capabilities with outputs reaching in excess of 120V with open-loop testing.
 
 \begin{figure}
@@ -188,11 +182,7 @@ The top layer of the PCB is shown in Figure~\ref{boostPCBTop} and the bottom is 
 \end{figure}
 
 \subsubsection{Boost Converter Efficiency}
-Energy conversion efficiency is an important factor for determining the effectiveness of the boost converter. Ideally, the circuit will have a 100\% power conversion rate but in practice this is not feasible. Losses occur during periods of conduction and switching due to parasitic resistances and capacitances.  Rates in the high ninetieth percentile have been achieved in some switching DC/DC converters but efficiencies falling more in the range of 90\% to 70\% are more common and can be deemed acceptable depending on the application. 
-
-
-
-A first order estimate of the boost's efficiency $\eta_{est}$, with the MOSFET, diode and inductor loss considerations, is calculated in the following the following equation.
+Energy conversion efficiency is an important factor for determining the effectiveness of the boost converter. Ideally, the circuit will have a 100\% power conversion rate but in practice this is not feasible. Losses occur during periods of conduction and switching due to parasitic resistances and capacitances.  Rates in the high ninetieth percentile have been achieved in some switching DC/DC converters but efficiencies falling more in the range of 90\% to 70\% are more common and can be deemed acceptable depending on the application. A first order estimate of the boost's efficiency $\eta_{est}$, with the MOSFET, diode and inductor loss considerations, is calculated in the following the following equation.
 
 \begin{equation}
 \eta_{est} = \frac{P_{in} - {(P_{sw}+P_L+P_D)}}{P_{in}} = 97\%
@@ -346,10 +336,5 @@ Following the microinverter topology, the inverter sits in an enclosure mounted 
 \label{solar stand}
 \end{figure}
 
-\subsection{Revision One}
-Revision one 
-First, we opted to omit the control card socket for a full microcontroller layout with a JTAG interface for debugging. Second, we omitted 
-
-\subsection{Revision Two}
-
-
+\subsection{Revision Two of the Hybrid Inverter Team Board}
+Revision one was found to have a few weak links in the signal chain, namely an undersized trace from the source of the boost FET to the shunt resistor in the path to ground, and a microcontroller layout that was too ambitious given the debugging timeframe. We opted to replace the microcontroller layout with a 100-dimm slot capable of holding a TI ISO-control card. This alleviated the possibility of a small error in the micro layout derailing our progress, and also had the added benefit of shriking our board layout slightly. The rearrangement of components necessitated a re-pouring of some power planes to accomodate capacitors that were placed closer to the H-bridge. The new layout facillitated cutouts in the ground plane that vectored high current injections to the ground plane around both the microcontroller and the sense circuitry. Because banana plugs are relatively expensive and bulky, we ommited a pair dedicated to retrieving feedback signals from the offboard filter with pin headers as these signals are not particularly high current. 
