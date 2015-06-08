@@ -6,9 +6,10 @@
 
 \lhead{Chapter 1. \emph{The Problems with Solar}} % This is for the header on each page - perhaps a shortened title
 
+
 %----------------------------------------------------------------------------------------
 \section{Motivation}
-Global demand for energy - combined with the surging interest in green technologies - has accelerated the need for a highly reliable, cost-efficient, and self-sustained electric power grid. While scientists and engineers everywhere agree that the global dependence on power derived from heat-engines is a primary cause of the climate change phenomena wreaking havoc on our planet, the integration of renewables into the power grid remains a major engineering endeavor. Future energy distribution systems should be capable of interconnecting diverse power sources including fossil and nuclear-fueled generators, as well as renewable sources such as hydropower, wind turbines, and photovoltaic arrays without adversely affecting the stability of power grids. 
+Global demand for energy - combined with the surging interest in green technologies - has accelerated the need for a highly reliable, cost-efficient, and self-sustained electric power grid \cite{futureGrid}. While scientists and engineers everywhere agree that the global dependence on power derived from heat-engines is a primary cause of the climate change phenomena wreaking havoc on our planet, the integration of renewables into the power grid remains a major engineering endeavor. Future energy distribution systems should be capable of interconnecting diverse power sources including fossil and nuclear-fueled generators, as well as renewable sources such as hydropower, wind turbines, and photovoltaic arrays without adversely affecting the stability of power grids. 
 
 While power derived from common thermodynamic cycles can be increased or decreased on-demand, renewable energy sources are dependent on highly variable environmental conditions, and hence, require robust power conversion techniques that can handle unstable and highly varying input power\cite{ricardo}. The focus of this research-oriented senior design project has been to explore the viability of implementing new hybrid control techniques for solar power conversion. This research is of great interest to us, and the public in general, as it may prove to be a valuable addition to the power system designers toolkit for situations necessitating exceptionally clean output with robust stability characteristics in the face of highly variable load and source conditions.
 
@@ -18,7 +19,6 @@ We seek to understand the reported benefits of hybrid control techniques in the 
 In order to meet the challenges involved with implementing new hybrid power conversion technologies, we must first understand the current landscape of power inverters, analyze their strengths and weaknesses, and then assess how we might improve upon their implementations. To this end, we will undertake a brief overview of the pulse-width modulation technique, the applicability of hybrid control algorithms to the problem of power conversion, and finally, we will briefly review the additional constraints that photovoltaic (PV) sources place on our design. 
 
 \subsection{Square and Modified Square Inverters}
-\todo[inline]{Find source of inverter modulation photos}
 \label{squareApproach}
 Square wave inverters are the simplest method for generating pseudo-sinusoidal outputs using an H-Bridge. They emulate the positive and negative half cycles of a sine with a simple bipolar scheme where the output is given to be either $+V_{dc}$ or $-V_{dc}$ respectively. After a filtering stage the resulting output can appear quite sinusoidal because primarily low frequency components of the square wave have been allowed to pass; however, closer inspection shows that real-world filters struggle to meet the very low cutoff requirements of the square wave inverter while maintainging a reasonable cost or form factor. As we will demonstrate in Chapter \ref{hardware}, the analog components needed to filter near 60Hz are prohibitively large and expensive. Note that the difference between a pure square wave and a modified square wave is the allowance of the zero state determined by the quantity $\alpha$ shown in Figure \ref{modifiedSquare} - this corrseponds to a third state we will call $zero_{vdc}$. Note that the Fourier series of the output is given by 
 \begin{equation}
@@ -33,7 +33,7 @@ This would add considerably to the complexity of any inverter system seeking to 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{modifiedSquare}
-\caption{A Modified Square Wave Inverter Crudely Emulates the Positive and Negative Half-Cycles of a Sine Wave}
+\caption{A modified square wave inverter crudely emulates the positive and negative half-cycles of a sine wave \cite{inverterFourier}}
 \label{modifiedSquare}
 \end{figure}
 
@@ -49,7 +49,7 @@ Compared to square and modified square wave inverters, much of the filtering bur
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{bipolarSwitching}
-\caption{Bipolar Switching Uses a Triangular Carrier and a Sinusoidal Reference to Change States from Rail to Rail}
+\caption{Bipolar switching uses a triangular carrier and a sinusoidal reference to change states from rail-to-rail. \cite{inverterFourier}}
 \label{bipolar}
 \end{figure}
 
@@ -59,7 +59,7 @@ The effective voltage or current is varied by modulating the duration of on-time
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{unipolarSwitching}
-\caption{Unipolar switching uses a triangular carrier and a sinusoidal reference to change states from either rail to zero, but never from rail to rail.}
+\caption{Unipolar switching uses a triangular carrier and a sinusoidal reference to change states from either rail to zero, but never from rail to rail.\cite{inverterFourier}}
 \label{unipolar}
 \end{figure}
 
@@ -68,7 +68,7 @@ The Fourier analysis for either bipolar or unipolar PWM output signals is not as
 \begin{figure}[h]
 \centering
 \includegraphics[width=3.5in]{pwmFourier}
-\caption{Fourier spectrum frequency diagram for both bipolar and unipolar pwm inverter control. Note that while the position of harmonics remains unchanged between either, the magnitude will likely differ.}
+\caption{Fourier spectrum frequency diagram for both bipolar and unipolar pwm inverter control. Note that while the position of harmonics remains unchanged between either, the magnitude will likely differ. \cite{inverterFourier}}
 \label{pwmFourier}
 \end{figure}
 
@@ -100,9 +100,9 @@ It is widely accepted that distributed generators (DG) and the use of 'smart inv
 \label{solarBlock}
 \end{figure}
 
-\todo[inline]{Ben wrote this paragraph}
-Switching power inverters are an enabling technology found in energy conversion systems. Photovoltaic (PV) panels harvest energy from the sun to generate the alternating current (AC) electricity used in the grid. PV arrays output direct current (DC) electricity, thus an inverter is required to generate the versatile AC power used in standard loads as shown in Figure~\ref{solarBlock}. Energy sourced from renewable resources is variable in nature and necessitates feedback controlled electronics to maintain stable power production. This project is focused on delivering a microinverter system as a robust solution for solar power applications. 
 
-Can hybrid techniques for PWM generation handle disturbances more robustly, with less overshoot or rise time than traditional inverters? Can they convert power more efficiently? Can they do it more simply, or for less money? If any combination of these qualities hold for this new process, then we can say definitively that this technique is a viable alternative to the tried and tested PWM techniques prevalent today.
+\hl{Switching power inverters are an enabling technology found in energy conversion systems. Photovoltaic (PV) panels harvest energy from the sun to generate the alternating current (AC) electricity used in the grid. PV arrays output direct current (DC) electricity, thus an inverter is required to generate the versatile AC power used in standard loads as shown in Figure}~\ref{solarBlock}. \hl{Energy sourced from renewable resources is variable in nature and necessitates feedback controlled electronics to maintain stable power production. This project is focused on delivering a microinverter system as a robust solution for solar power applications.}
+
+\hl{Can hybrid techniques for PWM generation handle disturbances more robustly, with less overshoot or rise time than traditional inverters? Can they convert power more efficiently? Can they do it more simply, or for less money? If any combination of these qualities hold for this new process, then we can say definitively that this technique is a viable alternative to the tried and tested PWM techniques prevalent today.}
 
 

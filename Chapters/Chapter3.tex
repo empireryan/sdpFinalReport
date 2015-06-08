@@ -20,7 +20,7 @@ As with any microcontroller system, it is necessary to first configure the vario
 \end{center}
 \end{figure}
 
-The two primary tasks of the software system are undoubtedly the control of the DC boost circuit, and the control of the inverter hardware. These tasks are pictured in Fig.\ref{fast} and Fig.\cite{slow} respectively. These tasks are performed using interrupt service routines (ISR)that are cued by the rising edge of a PWM signal. These signals offer a convenient way to trigger the interrupts, as well as the start of conversion (SOC) for the ADC. The SOC begins a sequential sampling of all the control signals on the board, making the most recent data available just in time for the execution of the ISR. Note that the PWM signals used for triggering interrupts are seperate from the PWM signals used for switching the transistors. With the execution of rapid-fire service routines, we may encounter the problematic condition where both ISRs attempt to fire at the same time. Instead of having the service routines fight for processor time with mechanisms like priorities, we opt to implement a phase synchronization scheme wherein the two PWM modules firing off interrupts are seperated by a pre-determined phase margin. This phase margin allows us to specify the time between rising edges of both PWM signals in relation to each other, the result being two dependent PWM channels that offer us an assurance that there will be no processor contention as long as we service either interrupt in a reasonable amount of clock cycles.
+The two primary tasks of the software system are undoubtedly the control of the DC boost circuit, and the control of the inverter hardware. These tasks are pictured in Figure \ref{fast} and Figure \ref{slow} respectively. These tasks are performed using interrupt service routines (ISRs) that are cued by the rising edge of a PWM signal. These signals offer a convenient way to trigger the interrupts, as well as the start of conversion (SOC) for the ADC. The SOC begins a sequential sampling of all the control signals on the board, making the most recent data available just in time for the execution of the ISR. Note that the PWM signals used for triggering interrupts are seperate from the PWM signals used for switching the transistors. With the execution of rapid-fire service routines, we may encounter the problematic condition where both ISRs attempt to fire at the same time. Instead of having the service routines fight for processor time with mechanisms like priorities, we opt to implement a phase synchronization scheme wherein the two PWM modules firing off interrupts are seperated by a pre-determined phase margin. This phase margin allows us to specify the time between rising edges of both PWM signals in relation to each other, the result being two dependent PWM channels that offer us an assurance that there will be no processor contention as long as we service either interrupt in a reasonable amount of clock cycles.
 
 \begin{figure}[h]
 \begin{center}
@@ -123,7 +123,7 @@ In order to assess the performance of the hybrid controller, we first needed to 
 \begin{center}
 \includegraphics[width = 4 in]{traditionalISR}
 \caption{Software diagram of the `slow' ~20kHZ traditional PWM inverter ISR}
-\label{fast}
+\label{slow}
 \end{center}
 \end{figure}
 
@@ -154,7 +154,7 @@ We aim to briefly clarify the mechanisms behind how the hybrid inverter works, a
 \begin{center}
 \includegraphics[width = 4 in]{hybridISR}
 \caption{Software diagram of the `slow' ~20kHZ hybrid PWM inverter ISR}
-\label{fast}
+\label{slow}
 \end{center}
 \end{figure}
 
