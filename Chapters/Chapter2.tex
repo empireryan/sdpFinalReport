@@ -285,9 +285,14 @@ Subsequent testing on filters that do not adhere to this constraint must be cond
 
 We constructed our filters using `power reactor' inductors from Triad magnetics. They are values at 35mH each if their coils are wires in series, or around 6mH if their coils are wound in parallel. To be clear, each inductor is constructed of a pair of inductors. Correspondingly, our maximum current decreases at the higher inductance, roughly $5A$ when wired in series, and maintains the rated inductance in the parallel configuration with a $10A$ rating. Inductors beyond this current rating were typically found to have lower inductances and prohibitvely high prices for our research. This limit on inductance is very much a materials science problem; as the current through the inductors increases, the cores used in their construction saturate and limit the effective inductance. 
 
-Using the constraint given above, we sized electrolytic capacitors for our series RLC filter. Because electrolytics are polar devices, we needed to use a special confguration where we used electrolytic pairs to construct non-polar electrolytic capacitors. This was found to be a relatively common trick, but we performed several stress tests to verify the robustness of this solution. Regardless, electrolytics are understood to be the weak-link in the lifespan of inverters with their short mean time to failure at moderate to high temperatures.  
+Using the constraint given above, we sized electrolytic capacitors for our series RLC filter. Because electrolytics are polar devices, we needed to use a special confguration where we used electrolytic pairs to construct non-polar electrolytic capacitors. This was found to be a relatively common trick, but we performed several stress tests to verify the robustness of this solution. Regardless, electrolytics are understood to be the weak-link in the lifespan of inverters with their short mean time to failure at moderate to high temperatures. The final constructed filter on turret board is shown in Figure ~\ref{filterTurret}.  
 
-\todo[inline]{include photo of filter}
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.5in]{filterTurret}
+\caption{RLC Resonant Filter}
+\label{filterTurret}
+\end{figure}
 
 \subsection{Feedback Sense}
 The sensor network is important for the operation of the inverter since it allows the microcontroller to monitor voltages and currents for feedback control. Voltage dividers are used to measure high potentials around the boost converter and filter outputs. The inverter's AC output voltage is measured by a differential op-amp with a DC offset of $1.65V$ to allow for the input signal's negative potential swings. A differential comparator IC implements zero cross detection as the biased AC wave oscillates above and below the DC reference. 
