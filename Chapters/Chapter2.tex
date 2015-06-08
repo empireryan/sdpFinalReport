@@ -35,7 +35,7 @@ A generic boost converter circuit is shown in Figure~\ref{genericBoost}. The ope
 \label{genericBoost}
 \end{figure}
 
-When the MOSFET is conducting, the output capacitor provides power to the load until it receives new charge during the second switching mode. A large ripple current flows through the inductor as the switching takes place. An important design constraint is to make sure that the inductor current always remains greater than zero such that continuous conduction mode (CCM) is maintained. CCM ensures that the voltage gain function remains a in linear relation solely with duty cycle $D$ as shown in Equation \ref{CCM Eq}. Discontinuous conduction mode (DCM) occurs when inductor current drops to zero during a switching cycle. The gain function for DCM, shown in Equation ~\ref{DCM Eq}, is more complex since it includes additional circuit parameters like inductance and is dependent on the load. 
+When the MOSFET is conducting, the output capacitor provides power to the load until it receives new charge during the second switching mode. A large ripple current flows through the inductor as the switching takes place. Boost converters can operate in two different ways depending on inductor current values. Continuous conduction mode (CCM) happens when the inductor current remains greater than zero at all times. CCM ensures that the voltage gain function remains a in linear relation solely with duty cycle $D$ as shown in Equation \ref{CCM Eq}. Discontinuous conduction mode (DCM) occurs when inductor current drops to zero during a switching cycle. The gain function for DCM, shown in Equation ~\ref{DCM Eq}, is more complex since it includes additional circuit parameters like inductance and is dependent on the load. 
 
 \begin{equation}
 \frac{V_{out}}{V_{in}} =  \frac{1}{1-D}
@@ -99,16 +99,16 @@ The operation of the boost converter in PSPICE required a switching signal to co
 \label{boostApproachSteady}
 \end{figure}
 
-The simulation and prototype boost circuits are operated open-loop so manual variation of duty cycle is required to obtain a certain output. Since the solar panel voltage can vary, the simulation circuit was run at the minimum 20V to check that the power output voltage could be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{panel,in}=20V$, and a new duty cycle set at 89.25\%. 
+The simulation and prototype boost circuits have open-loop operation such that manual variation of duty cycle is required to obtain a certain output. Since the solar panel voltage can vary, the simulation circuit runs at a minimum of 20V to check that the needed output voltage can be maintained. The simulation results confirm this with $V_{out}=169.73V$, $V_{pv,in}=20V$, and a new duty cycle set at 89.25\%. 
 
-This boost converter was designed to operate in continuous condition mode (CCM). This was achieved by selecting an inductor value above the calculated critical inductance and making sure it has appropriate current handling capabilities. CCM requires the average inductor current to be larger than at least half of the load current $I_L$. Tthis is factored into the inductance calculation of Equation ~\ref{Lcrit Eq}.  Figure~\ref{inductorCurrent} shows the rippled inductor current in CCM and the MOSFET switching signal that creates these dynamic effects. 
+This boost converter was designed to operate in continuous condition mode (CCM). This was achieved by selecting an inductor value above the calculated critical inductance and by making sure it has appropriate current handling capabilities. CCM requires the average inductor current to be larger than at least half of the load current. This is factored into the inductance calculation of Equation ~\ref{Lcrit Eq}.  Figure~\ref{inductorCurrent} shows the rippled inductor current during CCM and the MOSFET switching signal that creates these dynamic effects. 
 
 \begin{equation}
  L_{critical} \ge \frac{R_{load,maxpower}D(1-D)^2}{2f_{sw}}= 50 \mu F
 \label{Lcrit Eq}
 \end{equation}
 
-The series resistance of the inductor  does not generate enough heat to justify heatsinking considering its large copper construction but still dissipates power as estimated in the following equation.
+The series resistance of the inductor does not generate enough heat to justify heatsinking considering its large copper construction but it still dissipates power as estimated in the following equation.
 
 \begin{equation}
 P_L = (I_{in,rms})^2R_L = (5.47A)^2(0.025\Omega) = 0.75W 
@@ -141,33 +141,60 @@ P_{switching} = Q_{c,diode}V_{out}f_{sw}=0.14W
 \begin{equation}
  P_{dissipation,diode,total}= P_{conduction}+P_{switching}=2.91W 
 \end{equation}
-Since \todo[inline]{address heatsinking} heat sinked with a TO-220 bolt-on type sink.
+The $2.91W$ that the diode dissipates is significantly lower than the $136.3W$ rating for the device. Regardless, heat sinking it with a TO-220 bolt-on type sink is still a good practice.
 
-The output capacitance was designed as a parallel arrangement of two values of capacitance for fast and slow transient response. This increased the total capacitance while reducing the equivalent series resistances (ESR) of the devices. This helps reduce of the output voltage ripple of the boost converter. Since DC voltage output is required, maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
+The power MOSFET selected for the boost converter has very adequate voltage and current handling capabilities for the $200W$ design. The transistor experiences both switching and conduction power consumption which are shown in the following equations along with a thermal analysis for heatsinking.
+
 \begin{equation}
-Duty~Cycle = D= 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
+V_{off} = V_{out} + V_{f,diode} = 171.53V
+\end{equation} 
+\begin{equation}
+P_{cond} = \frac{1}{2}V_{off}I_Df_{sw}(t_{rise}+t_{fall}) = 0.68W
+\end{equation}
+\begin{equation}
+P_{sw} = C_{oss,FET}{V^2}_{off}f_{sw} = 1.11W
+\end{equation}
+\begin{equation}
+P_{dissipation} = P_{cond} + P_{sw} = 1.79W
+\end{equation}
+\begin{equation}
+P_{limit} \leq \frac{T_J-T_A}{R_{\theta JA,max}} = 2.02W > 1.79W
+\end{equation}
+\begin{equation}
+R_{\theta JA,new} = \frac{T_J-T_A}{P_{diss}} = 71.02\frac{\,^{\circ}\mathrm{C}}{W}
+\end{equation}
+\begin{equation}
+R_{\theta SA} \leq R_{\theta JA,new} - R_{\theta JC} - R_{\theta CS} = 63.73\frac{\,^{\circ}\mathrm{C}}{W}
+\label{FETsink}
+\end{equation}
+
+The $2.02W $ and $ 1.79W$ power losses calculated are close and thus heatsinking is required. The standard TO-220 heatsink with a thermal resistance of $25\frac{\,^{\circ}\mathrm{C}}{W}$ meets the criteria calculated in Equation ~\ref{FETsink}.
+
+The output capacitance was designed as a parallel arrangement of two values of capacitance for fast and slow transient response. This increases the total capacitance while reducing the equivalent series resistance (ESR) of the combination. This helps reduce the output voltage ripple of the boost converter. Since DC voltage output is required, a maximum ripple of 50mV = $\delta V_{out}$ is selected as the tolerance. To achieve this voltage ripple design, a critical minimum output capacitance was calculated.\cite{hasaneen}
+\begin{equation}
+D = 1 - \frac{V_{out}}{V_{in}} = 79.81\% 
 \end{equation}
 \begin{equation}
 C_{critical} \ge \frac{V_{out}D}{F_{sw}\delta V_{out}R_{load,maxpower}} = 370 \mu F
 \end{equation}
 
-Ratings on voltages and currents concerning components were determined through worst case calculations.\cite{kwasinski} 
+Voltage and current ratings for components are determined through worst case calculations.\cite{kwasinski} 
 \begin{equation}
-I_L = I_{diode} = I_{drain} = \frac{2}{\sqrt[2]{3}}I_{in,rms} 
+I_L = I_{diode} = I_{drain} = \frac{2}{\sqrt[]{3}}I_{in,rms} 
 \end{equation}
 \begin{equation}
  V_{cap} = V_{out} = 1.5V_{out,typ} = 2(169.73V) = 254.6V 
 \end{equation}
 \begin{equation}
- V_{diode} = V_{DS,FET} = 2(169.73V) =339.46V  
+ V_{diode} = V_{DS,FET} = 1.5(169.73V) =339.46V  
 \end{equation}
 \begin{equation}
 I_{cap} = I_{out,rms} = 1.18A 
 \end{equation}
 
-Figure~\ref{boostCompleteSchematic} contains this schematic which had many design concepts inspired by the Texas Instruments Solar Explorer Development environment.\cite{tiAppReportControl} The circuit schematic shows the conventional boost converter, the associated sensing and signal conditions circuits, and the gate driver circuit. The energy conversion portion of the boost board is shown in Figure~\ref{boostConverterCircuit} with an additional input filter capacitor bank. The sensing of the PV panel voltage and output voltage consisted of basic divider circuits with MCU pin protection diodes as shown in Figure~\ref{VpvSenseCircuit} and Figure~\ref{VboostSenseCircuit}. The input PV current is measured with a shunt resistor IC with high common-mode rejection in Figure~\ref{IpvSenseCircuit}. The switching transistor current is measured with a differential op-amp configuration as shown in Figure~\ref{IswSenseCircuit}. Lastly, the switched MOSFET has a low-side gate driver IC taking in PWM as depicted in Figure~\ref{gateDriverCircuit}. 
+Figure~\ref{boostCompleteSchematic} contains the complete boost schematic which has many design concepts inspired by the Texas Instruments Solar Explorer Development environment.\cite{tiAppReportControl} The circuit schematic shows the conventional boost converter, the associated sensing and signal conditions circuits, and the gate driver circuit. The energy conversion portion of the boost board is shown in Figure~\ref{boostConverterCircuit} with an additional input filter capacitor bank. The sensing of PV panel voltage and output voltage consisted of basic divider circuits with MCU pin protection diodes as shown in Figure~\ref{VpvSenseCircuit} and Figure~\ref{VboostSenseCircuit}. The input PV current is measured with a shunt resistor IC with high common-mode rejection in Figure~\ref{IpvSenseCircuit}. The switching transistor current is measured with a differential op-amp configuration as shown in Figure~\ref{IswSenseCircuit}. Lastly, the switched MOSFET has a low-side gate driver IC taking in PWM as depicted in Figure~\ref{gateDriverCircuit}. 
 
-The top layer of the PCB is shown in Figure~\ref{boostPCBTop} and the bottom is shown in Figure~\ref{boostPCBBottom}. The first generation prototype boost board PCB was created using a LPKF Protomat M60 router. This machine allows modified PCB gerber files to be milled into two-layer boards from standard copper clad plates. The resulting unpopulated boost board is shown in Figure~\ref{unpopulatedBoostPCB}. The board was then populated with components into a completed circuit as shown in Figure~\ref{Built Boost} Testing of the boost circuit configured its voltage gain capabilities with outputs reaching in excess of 120V with open-loop testing.
+The top layer of the PCB design is shown in Figure~\ref{boostPCBTop} and the bottom layer is shown in Figure~\ref{boostPCBBottom}. The first generation prototype boost board PCB was created using a LPKF Protomat M60 router. This machine allows modified PCB gerber files to be milled into two-layer boards from standard copper clad plates. The resulting unpopulated boost board is shown in Figure~\ref{unpopulatedBoostPCB}. The board was then populated with components into a completed circuit as shown in Figure~\ref{Built Boost} Testing of the boost circuit demonstrated its voltage gain capabilities with outputs reaching in excess of 120V during open-loop operation.
 
 \begin{figure}
 \centering
