@@ -42,7 +42,7 @@ typedef void (*State)(Fsm *, Event const *);
 
 The definition above used the C keyword typedef. What typedef allows us to do is to declare a new data type for our own use. In this case, our type is 'pointer to function.' This is an enabling tool for representing the state of a machine as a function.
 
-The next step trick is to use structures to organize all of our data in a meaningful way - for our purposes, you can think of these structs as classes, save for the fact that their methods are declared outside of the structure itself. Allow me to make a structure for the FSM itself, and call it 'Fsm.' Here's how we do it:
+The next step is to use structures to organize all of our data in a meaningful way - for our purposes, you can think of these structs as classes, save for the fact that their methods are declared outside of the structure itself. The structure for the FSM itself is defined as follows:
 
 \begin{lstlisting}
 struct Fsm
@@ -69,8 +69,7 @@ First up, we need to initialize the current state, i.e. give it something to poi
 \begin{lstlisting}
 #define _FsmCtor_(self_, init_) ((self_)->state__ = (State)(init_))
 \end{lstlisting}
-
-Next, it is desirable to go about triggering our initial transition. This is to say, our Fsm now points to the function we are using as the initialization state where we can do all the prep work we may need for the smooth operation of the Fsm, but now we want to get to work and make the machine run. We will trigger the initial transition with the following:
+The result is that our FSM's state member now points to a function which serves as our initial state. Next, it is desirable to go about triggering our initial transition. This is to say, our Fsm now points to the function we are using as the initialization state where we can do all the prep work we may need for the smooth operation of the Fsm, but now we want to get to work and make the machine run. We will trigger the initial transition with the following:
 
 \begin{lstlisting}
 #define FsmInit(self_, e_) (*(self_)->state__)((self_), (e_))
@@ -87,7 +86,7 @@ This will take some member of our particular Event structure that we defined abo
 \begin{lstlisting}
 #define _FsmTran_(self_, targ_) ((self_)->state__ = (State)(targ_))
 \end{lstlisting}
-Because the implementation of the state framework was, in our collective opinion, a major design hurdle, we feel it is productive to give the user a sense of the simplicity that this implementation imparts on FSM implementations. This is a particularly useful feature for us since we have several state machines in our systems, and the overall software design goal is extensibility.  
+Note that the function is called within the state functions themselves. Because the implementation of the state framework was, in our collective opinion, a major design hurdle, we feel it is productive to give the user a sense of the simplicity that this implementation imparts on FSM implementations. This is a particularly useful feature for us since we have several state machines in our systems, and the overall software design goal is extensibility.  
 
 \begin{lstlisting}
 int main()
@@ -117,7 +116,7 @@ While this brief example departs from our actual implementation on the micro, it
 One of the key features that made the Piccolo family of micro's an attractive option was the extensive power library that the the micro offered. In particular, the chip has the capability to run digital compensators of the 2P2Z form described in the section on the boost controller, and 3P3Z compensators as well. In addition, we have the ability to implement PID controllers with on-the-fly coefficient tuning via JTAG.
 
 \section{The PWM Algorithm Implementation Details}
-In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implemntation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
+In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implementation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
 
 \begin{figure}[h]
 \begin{center}
@@ -164,24 +163,24 @@ The derivation of the hybrid control algorithm is roughly as follows: given that
 \begin{center}
 \includegraphics[width = 3.5 in]{jumpMap}
 \caption{Jump Map of the Hybrid Algorithm \cite{ricardo}}
-\label{jump}
+\label{jumpMap}
 \end{center}
 \end{figure}
 
 We can think of the resultant solution to the sinusoidal driver as the ideal to which our system should strive, and therefore any deviation from this ideal can be considered as an error that needs to be corrected by the controller. These errors are detected by building a tracking band around the reference solution; this is done by choosing a neighborhood around the reference solution. Collectively, this region is known as the tracking band. Now, if we consider the instantaneous state of the system to be a vector made up of the capacitor voltage and the current through the inductor, then we can measure the location of the vector in relation to the tracking band on the VI plane. Since the inductor and capacitor are at all times 90 degrees out of phase without any load or perturbation, the ideal solution takes the shape of an ellipse on the VI plane. By taking the state vector's position relative to the tracking band, and knowing the trajectory at a given region on the VI plane, it is straightforward to develop a small set of rules governing the switching of the inverter, i.e. the jump between the three states of the H-bridge circuit, namely $q=1$, $q=-1$, and $q=0$. With this brief foundation, we are able to steer the state of the system around the VI plane, with the resultant output being a pseudo-sinusoid with the desired voltage and current amplitude and frequency. 
 
 With the logic for the controller worked out in Matlab, the work of porting the code to embedded C on the Texas Instruments DSP was a matter of fitting this logic within the bounds of the hardware modules onboard.
-In the sections above, namely Section \ref{softOver}, we discussed that the general flow of the software on the C2000 DSP is to first initialize and configure the hardware modules onboard, then to service interrupts for the boost converter and the inverter. Of chief concern in this section is the inverter ISR where we call upon a state machine that determines membership in the jump set, then informs the hardware of the appropriate action to take. The state machine is implemented using the custom state framework described above.
+In the sections above, namely Section \ref{softOver}, we discussed that the general flow of the software on the C2000 DSP is to first initialize and configure the hardware modules onboard, then to service interrupts for the boost converter and the inverter. Of chief concern in this section is the inverter ISR where we call upon a state machine that determines membership in the jump set, then informs the hardware of the appropriate action to take. The state machine is implemented using the custom state framework described above. The logic used to execute the hybrid PWM algorithm is given in Figure \ref{hybridFlow}.
 
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width = 6 in]{hybridLogic}
 \caption{Flow chart of the logic invloved with executing the `Hybrid Jump Logic' within the hybrid PWM inverter ISR}
-\label{fast}
+\label{hybridFlow}
 \end{center}
 \end{figure}
 
-The proper operation of the controller depends on it's interface with hardware; therefore, we will briefly cover the initialization of the PWM driver that we use to control the H-bridge. Adjacent PWM modules, namely PWM1 and PWM 2, are used to operate the half-bridge modules that make up the complete H-Bridge of our inverter. Each PWM module drives two PWM signals that are configured to be duals of one another - this prevent shoot-through in the H-bridge. These two signals are designated by PMWxA or PWMxB, where x is the number of the module, and A and B represent the two PWM signals of each module. In our implementation, PWMxA of each modules drives the low-side FET of each leg, while PWMxB drives the high side FET. 
+The proper operation of the controller depends on it's interface with hardware; therefore, we will briefly cover the initialization of the PWM driver that we use to control the H-bridge. Adjacent PWM modules, namely PWM 1 and PWM 2, are used to operate the half-bridge modules that make up the complete H-Bridge of our inverter. Each PWM module drives two PWM signals that are configured to be duals of one another - this prevent shoot-through in the H-bridge. These two signals are designated by PMWxA or PWMxB, where x is the number of the module, and A and B represent the two PWM signals of each module. In our implementation, PWMxA of each modules drives the low-side FET of each leg, while PWMxB drives the high side FET. 
 
 In our hardware setup, we configure parameters like deadband, counting mode, period and phase synchronization for the adjacent PWM modules driving our H-bridge. The driver function itself - because we are operating the PWM in hybrid mode as simple $0$ or $100\%$ duty cycle - utilizes the fact that we can set the trip of the ePWM modules to a period greater or less than the timer can ever reach. In this way, we can operate the PWM modules essentially as GPIO pins that are either logic high or logic low without reconfiguring the hardware to treat these pins as GPIO. This functionality could potentially allow for `hot-swapping' between hybrid and traditional PWM operation, although we do not make use of such a functionality at this time. Secondarily, the use of PWM modules to produce $0$ and $100\%$ duty cycles allows for the use of control law accelerator (CLA) functionality in future revisions. 
 
@@ -226,7 +225,7 @@ The result is a current path from vdc through the load, and back down to ground 
 
 After having properly configured the PWM modules for operation of an H-bridge, we can use the driver function to update the state of the H-Bridge with deadband for shoot-through protection. This driver function is called after the transition logic is executed, and the transition logic is executed only after the current state variable is constructed. Let's examine the update of the state variable on each iteration of the inverter ISR. 
 
-\todo[inline]{update this as we calculate the phase and clarify logic!}
+\todo{update these before final submission to SDP}
 \begin{lstlisting}
 	Vac_in = (long)((long)Vac_FB<<9)-Offset_Volt;	// shift to convert to Q21
 	inv_ref_cur_inst = _IQ24mpy(inv_Iset, (((long) (InvSine)) << 9));
@@ -244,7 +243,6 @@ After having properly configured the PWM modules for operation of an H-bridge, w
  
 Once the state variable has been updated for the current iteration of the ISR, the state variable can be passed to the state machine operating the hybrid algorithm. This is done with the following code:
 
-\todo[inline]{update this with the most recent code!}
 \begin{lstlisting}
 char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable state)
 {
@@ -393,6 +391,6 @@ char HBridgeTransitionFunction(HBridge self, HBridgeEvent *e, StateVariable stat
 }
 \end{lstlisting}
 
-The result of the C code above is identical to that in the Matlab iteration, save for the fact that it is superfluous to know whether or not we are in the flow set because they system is not solving any differential equations, but rather it is causing real hardware to execute in real-time.  Therefore, it is sufficient to determine whether or not we are in the jump set. Note that in the above code segment, there is no interface to hardware, only a change in the signal of the event 'e.' After the signal member of the event structure is set, this event gets dispatched to the current state (function), which performs the state transition. The current state of the machine is echoed in hardware via the hybrid PWM driver function. Thus, we have executed the full hybrid controller in C on our DSP. 
+The result of the C code above is identical to that in the Matlab iteration, save for the fact that it is superfluous to know whether or not we are in the flow set because we are not using a numerical solver, but executing on hardware in real-time; therefore, it is sufficient to determine whether or not we are in the jump set. Note that in the above code segment, there is no interface to hardware, only a change in the signal of the event 'e.' After the signal member of the event structure is set, this event gets dispatched to the current state (function), which performs the state transition. The current state of the machine is echoed in hardware via the hybrid PWM driver function. Thus, we have executed the full hybrid controller in C on our DSP. 
 
 While PWM algorithms offer a relatively simple means for analyzing the switching waveform since we are modulating a carrier signal of known frequency. This is not quite the case for the hybrid algorithm where the switching occurs in response to where and when the state of the system leaves or enters the tracking band, how often we check it, and the with of the regions $M1$ and $M2$ shown in Figure \ref{jump}. An in-depth comparative analysis of the switching behavior of either algorithm is saved for Chapter \ref{Chapter5}.
