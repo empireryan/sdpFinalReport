@@ -80,7 +80,6 @@ One of the most common metrics for assessing the quality of a signal is the tota
 \begin{equation}
 THD=\frac{\sqrt{\sum_{2}^{\infty}(V_n^2)_{rms}}}{(V_1)_{rms}} = \frac{(V)_{rms}^2-(V_1)^2_{rms}}{(V_1)_{rms}} = \frac{\sqrt{K_0^2+K_1^2+\ldots+K_n^2}}{K_1}\cdot100\%
 \end{equation} 
-\todo{rewrite this graph completely!}
 `Where ${V_n}_{rms}$ is the rms value of the $n^{th}$ harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component.'\cite{fourierAnalysis} The ideal to which we strive is a zero value for THD; however, this is typically unattainable in a real-world inverter implementation. As one of the primary metrics used to assess the spectral content of a signal, we aim to minimize the THD seen at the output of an inverter. With the Fourier series, we are able to derive the expected THD analytically for
 
 By using Fourier series, the determination of THD of a certain output is easy to obtain because magnitude of each harmonic $(C_n)$ can be calculated.
@@ -203,12 +202,11 @@ The results obtained for the hybrid PWM are thought to be quite similar to those
 In this section we undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar and unipolar PWM, and the hybrid PWM. We have taken our results mainly from two sources aside from the purely mathematical results obtained for bipolar and unipolar PWM given above. First, we compare state the results of fourier analysis in Matlab/Simulink using the fast fourier transform (FFT). Next, we discuss how the unipolar and hybrid PWM techniques fair in our real-world tests on the hybrid inverter team development board. These reults are obtained using the FFT functionality of a Tektronix DPO 3054 oscilloscope.
 
 \subsection{Bipolar PWM}
-
-
+In progress \ldots
 \subsection{Unipolar PWM}
-
+In progress \ldots
 \subsection{Hybrid Performance}
-
+In progress \ldots
 \section{Conclusion}
 Power conversion is far and above the most difficult task that a power systems designer working in the field of renewables can undertake due to the breadth that these engineers must posess; they need to have superior circuit analysis skills, a knack for using industry standard simulations tools, and a deft way with modern programming languages and digital signal controllers. Lacking any one of the above, it is nearly impossible to innovate, or even survive, in this space. The problems found in `standard' power converters are compundeded in renewable energy systems where loading and sourcing conditions can fluctuate wildly throughtout the course of any given day. With the demand for clean energy more dire than ever, engineers must push their understanding to squeeze every last Joule that their system can provide.
 
