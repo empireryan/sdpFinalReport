@@ -198,6 +198,29 @@ The results obtained for the hybrid PWM are thought to be quite similar to those
 \label{fourierLogMag}
 \end{figure}
 
+\subsection{Power Grid Quality}
+Power quality for the grid is subject to strict regulations that mandate either $60 Hz$ or $50 Hz$ operation depending on region. Grid-connected equipment and most consumer loads are designed for a set frequency. Deviation from these frequencies can result in serious system wide consequences including inefficiencies, interference and blackouts in the worst cases. Superimposed effects from variations in generation and loading conditions cause undesirable drift in the fundamental signal across the grid. An example of this is the spectral distortion caused by the nonlinear currents drawn by switching loads found in many consumer electronics and modern lighting ballasts. For comparison purposes, with the inverter discussed in this paper, the quality of the local power grid is analyzed. A time domain graph of a power cycle in our laboratory is shown in ~\ref{gridWave} 
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{gridWave.png}
+\caption{Power Grid Signal of the UC Santa Cruz Campus}
+\label{gridWave}
+\end{figure}
+
+The ideal waveform for Figure ~\ref{gridWave} is a sinusoid but aspects of distortion are observable in the irregularities of the curve. The mean frequency during the test is $60.04 Hz$ with high and low values of $60.20 Hz$ and $59.90 Hz$ respectively. To better understand the non-ideal underlying signals causing these effects, a fast Fourier transform is taken on the grid wave to reveal its harmonic contents as shown in ~\ref{gridFFT}.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{gridFFT.png}
+\caption{Fast Fourier Transform Spectrum of UC Santa Cruz's Grid}
+\label{gridFFT}
+\end{figure}
+
+The strength of the fundamental signal is apparent in Figure ~\ref{gridFFT} but the presence of harmonics is also seen. The odd order harmonics ($180 Hz$,$300 Hz$, ect.) in  Figure ~\ref{gridFFT} dominate the spectrum while even orders tend to have lesser influence due to their canceling nature. The total harmonic distortion is calculated to be $0.4\%$. These potentially harmful distortions are why preventative measures such as filtering and financial penalties are used for keeping grid-tied equipment within compliance. As the diversity of the grid grows, including the spread of distributed generation through photovoltaics, we must be aware of the quality of our electricity as it is important for a reliable grid.
+
+
+
 \section{PWM Performance}
 In this section we undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar and unipolar PWM, and the hybrid PWM. We have taken our results mainly from two sources aside from the purely mathematical results obtained for bipolar and unipolar PWM given above. First, we compare state the results of fourier analysis in Matlab/Simulink using the fast fourier transform (FFT). Next, we discuss how the unipolar and hybrid PWM techniques fair in our real-world tests on the hybrid inverter team development board. These reults are obtained using the FFT functionality of a Tektronix DPO 3054 oscilloscope.
 
