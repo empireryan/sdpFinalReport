@@ -231,17 +231,39 @@ The reality of being a two-man team has definitely caught up with our lofty rese
 
 If time were on our side, it would have been our wish to have implemented both bipolar and unipolar PWM in addition to hybrid PWM in order to compare their real world performance in terms of THD, efficiency, and robustness to disturbance; however, these analyses are what Masters theses are made of. With our limited time and budget, we were able to bounce back from a problematic Rev 1 board and send out a Rev 2 design in just a few days. Even still, the PCB turn times that were within our budget left us with all of a day and a half to power up and debug our hardware before our final presentation. 
 
+
 In spite of the setbacks, and the impossible time-frame of a complete PCB overhaul, the Hybrid Inverter Team (HIT) is proud to present the 'HIT Power Conversion Development Board Rev. 2' to CITRIS and the Hybrid Systems Lab. With this tool, we have enabled the study of power conversion algorithms at the micro inverter scale. As an incoming graduate student to the Hybrid Systems Lab at UCSC, Ryan Rodriguez and Jun Chai plan on using this robust and extensible validation tool to perform more in-depth research on power conversion and the 'smart grid.' 
 
 Our goal was to undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar or unipolar PWM, and the hybrid PWM. 
 Due to severe time constraints, we have only had the opportunity to successfully demonstrate unipolar PWM operation on our custom hardware. With the successful results given below, we are confident that full operation of the hybrid algorithm is simply a matter of debugging time that we just do not have at the moment.
 
+
 In the following section we discuss how the unipolar PWM technique fairs in our real-world tests on the HIT development board. These results are obtained using the FFT functionality of a Tektronix DPO 3054 oscilloscope, and are intended to verify the results we have obtained numerically in Section \ref{uniSection}. We also present fundamental results obtained from our outdoor test using the $170W$ Sharp PV module.
 
-\subsection{Unipolar PWM}
-\todo[inline]{Need to fill this in!}
 \subsection{Bipolar PWM}
 In progress \ldots
+
+\subsection{Unipolar PWM}
+The Hybrid Inverter Team's board is characterized while running unipolar PWM with a focus on spectral output. FFT is implemented on the AC output of the inverter during experimental testing in lab while using a high power DC supply for system input. The test's resulting frequency spectrum is shown in Figure ~\ref{FFT HIT Board PWM After Filter}.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{FFT_HIT_Board_PWM_After_Filter.PNG}
+\caption{Frequency Spectrum of HIT Board Using Unipolar PWM}
+\label{FFT HIT Board PWM After Filter}
+\end{figure}
+
+Figure ~\ref{FFT HIT Board PWM After Filter} depicts a fundamental signal at $60 Hz$ which dominates above the adjacent harmonics as seen by the logarithmic scale. The total harmonic distortion of this inverter output is calculated to be $101.3\%$ which is compared to the $77\%$ predicted by the SimPower System's simulation. These results verify the presence of moderately significant distortion which is less than ideal in a power supply. 
+
+In addition to the laboratory testing, an outdoor field test is conducted with a single PV panel and the HIT board operating with unipolar PWM. The experiment environmental conditions are close to optimal with a clear sky during mid-day in June. These conditions contribute to a high solar irradiance on the solar panel and allow for close to the maximum power draw. A resistive load is varied to alter current draw from the panel while input and output power measurements are taken. With no load, the open circuit voltage for the panel is resting at $40.1V$ which indicates the net effects of shunt diode currents in the solar cell network. The changing resistive load causes the terminal voltage of the panel to vary as expected from the non-linear IV loading curve. A maximum load of $100\Omega$ is placed on the $120VAC~ rms$ output of the inverter and a power output of $137W$ is achieved. Due to some suspected discrepancy in the current transformer clamp measurement tool used in the experiment, inverter board efficiency is approximately estimated to be about $80\%$ which correlates with the testing done on the boost converter. This indicates that upwards of $164W$ is sourced from the panel out of its capability of $170W$. The outdoor test setup at the Baskin School of Engineering is displayed in Figure ~\ref{Solar Test Setup}.
+
+\begin{figure}
+\centering
+\includegraphics[width = 3.5in]{Solar_Test.jpg}
+\caption{Outdoor HIT Board Solar Test Setup}
+\label{Solar Test Setup}
+\end{figure}
+  
 \subsection{Hybrid Performance}
 In progress \ldots
 
@@ -251,6 +273,3 @@ Power conversion is far and above the most difficult task that a power systems d
 This study, motivated by the need for new and innovative conversion techniques, has sought to assess the viability of a new hybrid technique for PWM generation. We have attempted to cover many of the challenges encountered by power systems designers while planning the architecture of their power converters while addressing the most pressing concerns: harmonic content, efficiency, robustness, and ease of implementation.
 
 Over the course of our 20+ week senior design project, we have come to understand the pulse-width modulation techniques that drive today's power converters, namely the single-phase inverter. The contender? A new hybrid technique for generating PWM signals. The reigning champion? The unipolar PWM technique. Although initial numerical results had shown that the new hybrid PWM technique was capable of producing a spectrum that was largely free from the low frequency content in the traditional PWM technique, it was later found that these simulations were taken from a simulation with a step disturbance at the input. It is believed that this disturbance contributed to the low frequency content found in the traditional PWM inverter. Additionally, it is a fundamental fact that the new hybrid technique is a closed lop system attempting to stabilize a state vector composed of current and voltage simultaneously. This system was compared to an open-loop bipolar PWM controller incapable of responding to a step response. Indeed, it has been stated in this research that closed-loop bipolar or unipolar PWM converters require PI or PID controllers to adjust duty cycle depending on the load or sourcing conditions at any given time. 
- 
-
-
