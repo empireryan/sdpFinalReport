@@ -8,8 +8,8 @@
 
 %----------------------------------------------------------------------------------------
 \section{Fourier Analysis}
-\label{fourier}
-One of the most pressing concerns regarding switching power supplies is the spectral content of the output signal, both before and after filtering. This is of chief concern to power systems designers because the demands that excess spectral content can place on filtering increase size, weight, and cost of the inverter system. These additional frequencies represent energy that must be dissipated by the filter, and hence an inefficiency in our system. A comparative analysis of the dominant PWM techniques is necessary to understand the costs and benefits of each technique, but more importantly for the purpose of this paper, to understand how the hybrid algorithm used to modulate pulse-widths stacks up. In this section we lean heavily on the work of Zhous in \cite{fourierAnalysis}. We contribute to this discussion by analyzing the performance of closed loop control, where Zhou strictly examines open loop PWM inverters.
+\label{Fourier}
+One of the most pressing concerns regarding switching power supplies is the spectral content of the output signal, both before and after filtering. This is of chief concern to power systems designers because the demands that excess spectral content can place on filtering increase size, weight, and cost of the inverter system. These additional frequencies represent energy that must be dissipated by the filter, and hence an inefficiency in our system. A comparative analysis of the dominant PWM techniques is necessary to understand the costs and benefits of each technique, but more importantly for the purpose of this paper, to understand how the hybrid algorithm used to modulate pulse-widths stacks up. In this section we lean heavily on the work of Zhous in \cite{FourierAnalysis}. We contribute to this discussion by analyzing the performance of closed loop control, where Zhou strictly examines open loop PWM inverters.
 
 Recall that any signal can be decomposed into a sum of sines and cosines given by the expression:
 \begin{equation}
@@ -80,7 +80,7 @@ One of the most common metrics for assessing the quality of a signal is the tota
 \begin{equation}
 THD=\frac{\sqrt{\sum_{2}^{\infty}(V_n^2)_{rms}}}{(V_1)_{rms}} = \frac{(V)_{rms}^2-(V_1)^2_{rms}}{(V_1)_{rms}} = \frac{\sqrt{K_0^2+K_1^2+\ldots+K_n^2}}{K_1}\cdot100\%
 \end{equation} 
-`Where ${V_n}_{rms}$ is the rms value of the $n^{th}$ harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component.'\cite{fourierAnalysis} The ideal to which we strive is a zero value for THD; however, this is typically unattainable in a real-world inverter implementation. As one of the primary metrics used to assess the spectral content of a signal, we aim to minimize the THD seen at the output of an inverter. With the Fourier series, we are able to derive the expected THD analytically for
+`Where ${V_n}_{rms}$ is the rms value of the $n^{th}$ harmonic of $V_0(t)$, while ${V_1}_{rms}$ is the rms value of the fundamental frequency component.'\cite{FourierAnalysis} The ideal to which we strive is a zero value for THD; however, this is typically unattainable in a real-world inverter implementation. As one of the primary metrics used to assess the spectral content of a signal, we aim to minimize the THD seen at the output of an inverter. With the Fourier series, we are able to derive the expected THD analytically for
 
 By using Fourier series, the determination of THD of a certain output is easy to obtain because magnitude of each harmonic $(C_n)$ can be calculated.
 
@@ -114,11 +114,11 @@ Where $V_{ref}$ is the reference signal, and $V_c$ is the carrier signal. In Fig
 \begin{figure}
 \centering
 \includegraphics[width = 3.5in]{bipolarPwmShot}
-\caption{The operation of a bipolar switching scheme for an inverter.\cite{fourierAnalysis}} 
+\caption{The operation of a bipolar switching scheme for an inverter.\cite{FourierAnalysis}} 
 \label{bipolarSwitchingOperation}
 \end{figure}
 
-In Simulink we implemented a simple bipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{bipolarFFTMatlab}. The THD of this signal is found to be nearly $147\%$, and we note that the harmonics at the the frequency of modulation are greater than the funamentals for this scheme.
+In Simulink we implemented a simple bipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{bipolarFFTMatlab}. The THD of this signal is found to be nearly $147\%$, and we note that the harmonics at the the frequency of modulation are greater than the fundamentals for this scheme.
 
 \begin{figure}
 \centering
@@ -127,7 +127,7 @@ In Simulink we implemented a simple bipolar inverter and performed an FFT using 
 \label{bipolarFFTMatlab}
 \end{figure}
 
-Analytically, from \cite{fourierAnlaysis}, we get that the fourier coefficients of the bipolar swithcing scheme are:
+Analytically, from \cite{FourierAnlaysis}, we get that the Fourier coefficients of the bipolar switching scheme are:
 
 \begin{equation}
 a_n = \frac{2}{\pi} \Big[\int_{\theta_1}^{\theta_2} \cos(n\omega t) d\omega t + \int_{\theta_2}^{\theta_3} -\cos(n\omega t)d\omega t +\ldots +
@@ -143,7 +143,7 @@ Due to time constraints, we were not able to perform analyses on a bipolar inver
 
 \subsection{Analyzing the Spectrum of Unipolar PWM}
 \label{uniSpectrum}
-The operation of the unipolar PWM works under the following rules, given a triangular carrier signal and a sinusoidal reference. Note that in Figure \ref{unipolarStates}, ${V_{control}}_{1}$ is the dual of ${V_{control}}_{2}$, so we only require a single contrl signal in software.
+The operation of the unipolar PWM works under the following rules, given a triangular carrier signal and a sinusoidal reference. Note that in Figure \ref{unipolarStates}, ${V_{control}}_{1}$ is the dual of ${V_{control}}_{2}$, so we only require a single control signal in software.
 
 \begin{equation}
 \label{unipolarStates}
@@ -158,11 +158,11 @@ From this control law, one obtains the resultant waveforms shown in Figure \ref{
 \begin{figure}
 \centering
 \includegraphics[width = 3.5in]{unipolarPwmShot}
-\caption{The operation of a unipolar switching scheme for an inverter. Note that a single control signal is used in our software implementation since each control signal is the other's dual. \cite{fourierAnalysis}}
+\caption{The operation of a unipolar switching scheme for an inverter. Note that a single control signal is used in our software implementation since each control signal is the other's dual. \cite{FourierAnalysis}}
 \label{unipolarPwmShot}
 \end{figure}
 
-Again, using Simulink we implemented a unipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{unipolarFFTMatlab}. The THD of this signal is found to be around $77\%$, or nearly half that of the bipolar scheme. Here, the magnitdude of the fundamental is greater than any of the harmonics. These results confirm those of \cite{fourierAnalysis}, though we found the THD of the bipolar scheme in our simulation to be much higher. Both measurements were taken before any kind of filtering stage. 
+Again, using Simulink we implemented a unipolar inverter and performed an FFT using the powerGUI in SimPower Systems. The results are shown in Figure \ref{unipolarFFTMatlab}. The THD of this signal is found to be around $77\%$, or nearly half that of the bipolar scheme. Here, the magnitdude of the fundamental is greater than any of the harmonics. These results confirm those of \cite{FourierAnalysis}, though we found the THD of the bipolar scheme in our simulation to be much higher. Both measurements were taken before any kind of filtering stage. 
 
 \begin{figure}
 \centering
@@ -171,7 +171,7 @@ Again, using Simulink we implemented a unipolar inverter and performed an FFT us
 \label{unipolarFFTMatlab}
 \end{figure}
 
-As for the bipolar case, the fourier coefficients for the unipolar case are found to be:
+As for the bipolar case, the Fourier coefficients for the unipolar case are found to be:
 \begin{equation}
 a_n = \frac{2}{\pi} \Big[\int_{\theta_1}^{\theta_2} \cos(n\omega t) d\omega t + \int_{\theta_3}^{\theta_4} \cos(n\omega t)d\omega t +\ldots +
 \int_{\theta_{2k-1}}^{\theta_{2k}} \cos(n\omega t)d\omega \Big]
@@ -183,23 +183,29 @@ b_n = \frac{2}{\pi} \Big[\int_{\theta_1}^{\theta_2} \sin(n\omega t) d\omega t + 
 \end{equation} 
 
 \subsection{Analyzing the Spectrum of the Hybrid PWM}
-The results obtained for the hybrid PWM are thought to be quite similar to those of the bipolar switching scheme, due to the fact that they both allow switching directly from $+V_{dc}$ to $-V_{dc}$. Therefore, it can be safely assumed that both EMI and THD in the hybrid switching case will be unfavorable in comparison to the unipolar switching scheme. From an efficiency standpoint, it appears that the hybrid switching scheme is also at a disadvantage compared to unipolar due to the fact that the sine wave is traced out of a wave rapidly swithcing between $+V_{dc}$ to $-V_{dc}$ to obtain a sine wave, and hence we are `undoing' some of the peak voltage seen at the output. The result is lower $V_{rms}$ output from the bipolar switching, necessitating a higher voltage input. This voltage differential must be accounted for either by higher duty cycles of the boost converter, or more solar panels. While it would be a stretch to say that the boost converter is inefficient, the DC/DC stage is far from ideal, accounting for a large percentage of loss in any inverter system that utilizes them. 
+The results obtained for the hybrid PWM are thought to be quite similar to those of the bipolar switching scheme, due to the fact that they both allow switching directly from $+V_{dc}$ to $-V_{dc}$. Therefore, it can be safely assumed that both EMI and THD in the hybrid switching case will be unfavorable in comparison to the unipolar switching scheme.
 
-\begin{figure}
+\begin{figure}[ht]
 \centering
-\includegraphics[width = 5.5in]{fourierLinear}
+\includegraphics[width = 5in, height = 2in]{hybridSpectra}
+\caption{The spectrum of the hybrid inverter, calculated from the voltage vector generated by the hybrid simulation. The output shows significant low frequency content with harmonics bunched around the fundamental.}
+\label{hybridSpectra}
+\end{figure}
+
+The spectrum shown in Figure \ref{hybridSpectra} is rich in sub-fundamental content, with a much tighter bunching of harmonics around the fundamental as compared to other switching schemes studied thus far.
+
+From an efficiency standpoint, it appears that the hybrid switching scheme is also at a disadvantage compared to unipolar due to the fact that the sine wave is traced out of a wave rapidly switching between $+V_{dc}$ to $-V_{dc}$ to obtain a sine wave, and hence we are `undoing' some of the peak voltage seen at the output. The result is lower $V_{rms}$ output from the bipolar switching, necessitating a higher voltage input. This voltage differential must be accounted for either by higher duty cycles of the boost converter, or more solar panels. While it would be a stretch to say that the boost converter is inefficient, the DC/DC stage is far from ideal, accounting for a large percentage of loss in inverters that utilize them. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width = 5.5in]{hybridFFT}
 \caption{A plot showing voltage output of the hybrid inverter simulated in Matlab, as well as Fourier data for the magnitude (dB) and phase (degrees) respectively.}
-\label{fourierLinear}
+\label{hybridFFT}
 \end{figure}
 
-\begin{figure}
-\centering
-\includegraphics[width = 5.5in]{fourierLogMag}
-\caption{The spectral content of a hybrid inverter is given by FFT analysis performed on the Matlab simulations results. Harmonics are shown in Hertz, and gain is shown linearly in Volts.}
-\label{fourierLogMag}
-\end{figure}
+From Figure \ref{hybridFFT}, we see that Bode plot of the voltage FFT confirms the presence of low frequencies at the output, with approximately $100dB$ per decade roll-off past the $60Hz$ cutoff. 
 
-\subsection{Power Grid Quality}
+\subsection{Distortion in the Power Grid}
 Power quality for the grid is subject to strict regulations that mandate either $60 Hz$ or $50 Hz$ operation depending on region. Grid-connected equipment and most consumer loads are designed for a set frequency. Deviation from these frequencies can result in serious system wide consequences including inefficiencies, interference and blackouts in the worst cases. Superimposed effects from variations in generation and loading conditions cause undesirable drift in the fundamental signal across the grid. An example of this is the spectral distortion caused by the nonlinear currents drawn by switching loads found in many consumer electronics and modern lighting ballasts. For comparison purposes, with the inverter discussed in this paper, the quality of the local power grid is analyzed. A time domain graph of a power cycle in our laboratory is shown in ~\ref{gridWave} 
 
 \begin{figure}
@@ -227,17 +233,16 @@ If time were on our side, it would have been our wish to have implemented both b
 
 In spite of the setbacks, and the impossible time-frame of a complete PCB overhaul, the Hybrid Inverter Team (HIT) is proud to present the 'HIT Power Conversion Development Board Rev. 2' to CITRIS and the Hybrid Systems Lab. With this tool, we have enabled the study of power conversion algorithms at the micro inverter scale. As an incoming graduate student to the Hybrid Systems Lab at UCSC, Ryan Rodriguez and Jun Chai plan on using this robust and extensible validation tool to perform more in-depth research on power conversion and the 'smart grid.' 
 
-
-we undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar and unipolar PWM, and the hybrid PWM. 
-Due to severe time constraints, we have only had the opportunity to successfully demonstrate unipolar PWM operation. With the successful results given below, we are confident that full operation of the hybrid algorithm is simply a matter of debugging time that we just do not have at the moment.
+Our goal was to undertake a comparative study of the three PWM techniques that have been the focus of much of this work: bipolar or unipolar PWM, and the hybrid PWM. 
+Due to severe time constraints, we have only had the opportunity to successfully demonstrate unipolar PWM operation on our custom hardware. With the successful results given below, we are confident that full operation of the hybrid algorithm is simply a matter of debugging time that we just do not have at the moment.
 
 In the following section we discuss how the unipolar PWM technique fairs in our real-world tests on the HIT development board. These results are obtained using the FFT functionality of a Tektronix DPO 3054 oscilloscope, and are intended to verify the results we have obtained numerically in Section \ref{uniSection}. We also present fundamental results obtained from our outdoor test using the $170W$ Sharp PV module.
 
 \subsection{Unipolar PWM}
+\todo[inline]{Need to fill this in!}
+\subsection{Bipolar PWM}
 In progress \ldots
 \subsection{Hybrid Performance}
-In progress \ldots
-\subsection{Bipolar PWM}
 In progress \ldots
 
 \section{Conclusion}
