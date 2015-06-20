@@ -179,7 +179,7 @@ Note the deviation in this result from the previous one obtained by the average 
 \label{prePlant}
 \end{center}
 \end{figure}
-One of the first methods that we used was modeling via simulink. By utilizing an off-the-shelf inverter model, we were able to ascertain the transfer function by following the steps outlined below. 
+One of the first methods that we used was modeling via Simulink. By utilizing an off-the-shelf inverter model, we were able to ascertain the transfer function by following the steps outlined below. 
 
 We began by opening the model below. The $mdl$ variable is reused, so do not omit it.
 \begin{verbatim}
@@ -296,7 +296,7 @@ f_p = f_ck_{boost}\\
 k_{c} = \frac{\omega_z}{|G_{ps}(s)|_{f_c}}\\
 \end{gather*}
 
-By selecting a resonable crossover frequency $f_c$, we can calculate the require parameters of this expression. The resulting compensator is shown in Fig. \ref{lagRidley}.
+By selecting a reasonable crossover frequency $f_c$, we can calculate the require parameters of this expression. The resulting compensator is shown in Fig. \ref{lagRidley}.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[height= 3in, width = \columnwidth]{lagRidley}
@@ -325,7 +325,7 @@ For a closer inspection, see Fig. \ref{gpMargin} which clearly shows the gain an
 \end{figure}
 
 \section{2P2Z}
-As we can see, the lag compensator was simply a special case of PI control. A 2P2Z can implement the continuous time version by way of a bilinear or Tustin transformation. The rule for the bilinear transform is that $s\leftarrow\frac{2z-1}{Tz+1}$, Performing this transformation on our controller equation results in an expression of the same form, implementable in assembly on a C2000 Piccolo micro controller by TI. The Biricha tool recommended by TI takes the position of poles and zeroes and convertes them to the necessary coefficients for the micro.
+As we can see, the lag compensator was simply a special case of PI control. A 2P2Z can implement the continuous time version by way of a bilinear or Tustin transformation. The rule for the bilinear transform is that $s\leftarrow\frac{2z-1}{Tz+1}$, Performing this transformation on our controller equation results in an expression of the same form, implementable in assembly on a C2000 Piccolo micro controller by TI. The Biricha tool recommended by TI takes the position of poles and zeroes and converts them to the necessary coefficients for the micro.
 
 \section{Concluding Remarks on the Boost Controller}
 After a fairly exhaustive review of the literature regarding the accuracy of the linearized DC boost model, and the control theory behind their employment in SWMPS, We were able to get favorable results in simulation, namely a stable system. While there are multiple methods for linearizing the boost circuit, the most widely accepted models today utilize of Dr. Ridley's due to its highly accurate predictions. This model was used in the design of a lag compensator. The Final phase involved the conversion of our linear model to a discrete model suitable for implementation on a micro controller.

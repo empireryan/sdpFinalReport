@@ -20,7 +20,7 @@ As with any microcontroller system, it is necessary to first configure the vario
 \end{center}
 \end{figure}
 
-The two primary tasks of the software system are undoubtedly the control of the DC boost circuit, and the control of the inverter hardware. These tasks are pictured in Figure \ref{fast} and Figure \ref{slow} respectively. These tasks are performed using interrupt service routines (ISRs) that are cued by the rising edge of a PWM signal. These signals offer a convenient way to trigger the interrupts, as well as the start of conversion (SOC) for the ADC. The SOC begins a sequential sampling of all the control signals on the board, making the most recent data available just in time for the execution of the ISR. Note that the PWM signals used for triggering interrupts are seperate from the PWM signals used for switching the transistors. With the execution of rapid-fire service routines, we may encounter the problematic condition where both ISRs attempt to fire at the same time. Instead of having the service routines fight for processor time with mechanisms like priorities, we opt to implement a phase synchronization scheme wherein the two PWM modules firing off interrupts are seperated by a pre-determined phase margin. This phase margin allows us to specify the time between rising edges of both PWM signals in relation to each other, the result being two dependent PWM channels that offer us an assurance that there will be no processor contention as long as we service either interrupt in a reasonable amount of clock cycles.
+The two primary tasks of the software system are undoubtedly the control of the DC boost circuit, and the control of the inverter hardware. These tasks are pictured in Figure \ref{fast} and Figure \ref{slow} respectively. These tasks are performed using interrupt service routines (ISRs) that are cued by the rising edge of a PWM signal. These signals offer a convenient way to trigger the interrupts, as well as the start of conversion (SOC) for the ADC. The SOC begins a sequential sampling of all the control signals on the board, making the most recent data available just in time for the execution of the ISR. Note that the PWM signals used for triggering interrupts are separate from the PWM signals used for switching the transistors. With the execution of rapid-fire service routines, we may encounter the problematic condition where both ISRs attempt to fire at the same time. Instead of having the service routines fight for processor time with mechanisms like priorities, we opt to implement a phase synchronization scheme wherein the two PWM modules firing off interrupts are separated by a pre-determined phase margin. This phase margin allows us to specify the time between rising edges of both PWM signals in relation to each other, the result being two dependent PWM channels that offer us an assurance that there will be no processor contention as long as we service either interrupt in a reasonable amount of clock cycles.
 
 \begin{figure}[h]
 \begin{center}
@@ -69,20 +69,20 @@ First up, we need to initialize the current state, i.e. give it something to poi
 \begin{lstlisting}
 #define _FsmCtor_(self_, init_) ((self_)->state__ = (State)(init_))
 \end{lstlisting}
-The result is that our FSM's state member now points to a function which serves as our initial state. Next, it is desirable to go about triggering our initial transition. This is to say, our Fsm now points to the function we are using as the initialization state where we can do all the prep work we may need for the smooth operation of the Fsm, but now we want to get to work and make the machine run. We will trigger the initial transition with the following:
+The result is that our FSM's state member now points to a function which serves as our initial state. Next, it is desirable to go about triggering our initial transition. This is to say, our FSM now points to the function we are using as the initialization state where we can do all the prep work we may need for the smooth operation of the FSM, but now we want to get to work and make the machine run. We will trigger the initial transition with the following:
 
 \begin{lstlisting}
 #define FsmInit(self_, e_) (*(self_)->state__)((self_), (e_))
 \end{lstlisting}
 
-Now we've got a state machine that is in some state - the Fsm 'class' is pointing to some function we are using as a state - and we are ready to respond to events. How do we do it? With this inlined macro:
+Now we've got a state machine that is in some state - the FSM 'class' is pointing to some function we are using as a state - and we are ready to respond to events. How do we do it? With this inlined macro:
 
 \begin{lstlisting}
 #define FsmDispatch(self_, e_) (*(self_)->state__)((self_), (e_))
 \end{lstlisting}
 
 
-This will take some member of our particular Event structure that we defined above, and send the event to the function for it to respond to. This response is usually some action or state transition, or both.Finally, to round out our Fsm back-bone functions, we need something to actually implement the state transition, i.e. some function that updates the pointer and sets it to the new state when appropriate. This is accomplished with the following macro:
+This will take some member of our particular Event structure that we defined above, and send the event to the function for it to respond to. This response is usually some action or state transition, or both.Finally, to round out our FSM back-bone functions, we need something to actually implement the state transition, i.e. some function that updates the pointer and sets it to the new state when appropriate. This is accomplished with the following macro:
 \begin{lstlisting}
 #define _FsmTran_(self_, targ_) ((self_)->state__ = (State)(targ_))
 \end{lstlisting}
@@ -116,7 +116,7 @@ While this brief example departs from our actual implementation on the micro, it
 One of the key features that made the Piccolo family of micro's an attractive option was the extensive power library that the the micro offered. In particular, the chip has the capability to run digital compensators of the 2P2Z form described in the section on the boost controller, and 3P3Z compensators as well. In addition, we have the ability to implement PID controllers with on-the-fly coefficient tuning via JTAG.
 
 \section{The PWM Algorithm Implementation Details}
-In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implementation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algortihm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implemntation on the micro.
+In order to assess the performance of the hybrid controller, we first needed to develop and assess the baseline performance of a typical PWM implementation. This was done using the C2000 DSP which has generous functionality for accomplishing power conversion tasks. We decided to implement a unipolar PWM algorithm due to it's relative simplicity, and also because it is the most commonly implemented algorithm found on inverters today. The gist of the unipolar inverter algorithm is covered in Section \ref{pwmApproach}. Here, we will detail the specifics of the implementation on the micro.
 
 \begin{figure}[h]
 \begin{center}
@@ -128,7 +128,7 @@ In order to assess the performance of the hybrid controller, we first needed to 
 
 Since the DC bus is not regulated by the boost stage feeding the inverter, the inverter itself uses nested control loops; the inner loop is for voltage control, and the outer loop employs current control. The voltage loop is used to provide a reference to the current loop; as the inverter is loaded and current demand increases, it is natural for the voltage to sag. The current reference at any instant is used with a software PID controller to provide the duty cycle to the inverter. To prevent current distortion, the voltage loop is only updated during zero-crossing events.
 
-A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 20kHz in the case of the inverter's PWM. Using the Texas Instruments digital power library blocks, we then generate the sinusoidal reference. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. Inverse logic is true during the negative half-cycle. These comparisions are done by the PWM driver function, which is fed by the PID controllers of the inverter loop.
+A unipolar inverter operates by comparing a triangular carrier wave to a sinusoidal reference signal. The triangular carrier wave generated is not a physical signal in our system, but rather an up-down counter set for a frequency of 20kHz in the case of the inverter's PWM. Using the Texas Instruments digital power library blocks, we then generate the sinusoidal reference. During the positive half cycle, if the sinusoidal reference becomes less than the triangular wave, the output of the PWM goes low. The resulting output waveform is sparse when the phase of the sinusoidal reference is near zero or $\pi$ radians, and becomes dense around $\frac{\pi}{2}$ radians. Inverse logic is true during the negative half-cycle. These comparisons are done by the PWM driver function, which is fed by the PID controllers of the inverter loop.
 
 \section{Hybrid Algorithm Implementation Details}
 In the initial stages of research and development, the hybrid inverter team first sought to recreate the simulations described in \cite{ricardo}. These simulations were best accomplished using the Hybrid Equations Toolbox in Matlab. Although the particulars of this implementation would be quite different than the final implementation in hardware, it was an excellent exercise in understanding the particulars of the algorithm, and also to give us a reference while implementing the hybrid controller on the C2000 micro controller in C. 
@@ -136,9 +136,9 @@ In the initial stages of research and development, the hybrid inverter team firs
 \subsection{The Matlab Implementation}
 The first step in building the algorithm with Matlab was to translate the flow and jump sets into Matlab code. Determining which set the solution of the RLC filter is a member is critical in determining when to switch, and when to allow the differential equation solver to flow. 
 
-These sets roughly translate as follows. Note that it can be helpful to refer to Figure \ref{jump} when deciphering the subsequent expressions. The flow set was translated as shown in \ref{lst:flowSetMatlab}.
+These sets roughly translate as follows. Note that it can be helpful to refer to Figure \ref{jumpMap} when deciphering the subsequent expressions. The flow set was translated as shown in \ref{lst:flowSetMatlab}.
 
-The translation of the jump set is shown in the following code section. The jump set signals to the framework that it is time to change states. This requires that the solver change the set of equations that it is operating on. Determinning membership of the state variable in the jump set is done by the code given in \ref{lst:jumpSetMatlab}.
+The translation of the jump set is shown in the following code section. The jump set signals to the framework that it is time to change states. This requires that the solver change the set of equations that it is operating on. Determining membership of the state variable in the jump set is done by the code given in \ref{lst:jumpSetMatlab}.
 
 Now that we've determined whether we're in the flow set $C$, or the jump set $D$, we can perform the requisite logic for the controller. Here we give priority to jumps; this is to say, if we're in the sets $C$ and $D$, give priority to the jump set and perform the necessary state transition instead of continuing to flow continuously. If we're in the jump set, this signals to the controller that we ought to execute a transition according to the jump map given in \ref{lst:jumpMapMatlab}.
 
@@ -175,7 +175,7 @@ In the sections above, namely Section \ref{softOver}, we discussed that the gene
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width = 6 in]{hybridLogic}
-\caption{Flow chart of the logic invloved with executing the `Hybrid Jump Logic' within the hybrid PWM inverter ISR}
+\caption{Flow chart of the logic involved with executing the `Hybrid Jump Logic' within the hybrid PWM inverter ISR}
 \label{hybridFlow}
 \end{center}
 \end{figure}
@@ -220,7 +220,7 @@ The PWM driver function was written as follows:
 #endif
 \end{lstlisting}
 
-As shown in code example \ref{lst:driver}, putting a zero in the CMPA register of leg 2 (n+1) means that the high side fet on leg 2 is off, and the low side fet is on. Putting TBPRD+1 in the CMPA register of  leg 1 means that the low side fet is off, while the high side fet is on. 
+As shown in code example \ref{lst:driver}, putting a zero in the CMPA register of leg 2 (n+1) means that the high side FET on leg 2 is off, and the low side FET is on. Putting TBPRD+1 in the CMPA register of  leg 1 means that the low side FET is off, while the high side FET is on. 
 The result is a current path from vdc through the load, and back down to ground (effectively $+V_{dc}$ at the load). Following an inverse logic, we can achieve $-V_{dc}$ at the load, as well as connecting the load to ground - effectively placing zero volts at the load - by driving both low side FETs.
 
 After having properly configured the PWM modules for operation of an H-bridge, we can use the driver function to update the state of the H-Bridge with deadband for shoot-through protection. This driver function is called after the transition logic is executed, and the transition logic is executed only after the current state variable is constructed. Let's examine the update of the state variable on each iteration of the inverter ISR. 
